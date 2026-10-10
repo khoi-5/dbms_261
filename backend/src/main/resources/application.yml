@@ -1,0 +1,15 @@
+# Cấu hình ứng dụng dự kiến
+# File hiện chỉ chứa ghi chú, chưa có cấu hình chạy thực tế.
+#
+# Khi triển khai, thống nhất cổng chạy và các thông tin kết nối database.
+# Thông tin nhạy cảm được cung cấp qua biến môi trường hoặc cơ chế cấu hình phù hợp.
+# Không sao chép mật khẩu sa vào source; tài khoản ứng dụng cần quyền phù hợp.
+#
+# Xác định database phát triển trước khi chạy migration hoặc nạp dữ liệu mẫu.
+# Nếu schema được quản lý bằng migration, JPA có thể kiểm tra mapping với schema
+# thay vì tự tạo, sửa hoặc xóa bảng khi ứng dụng khởi động.
+#
+# Cấu hình múi giờ, địa chỉ frontend, log và cơ chế xác thực theo môi trường.
+# Backend Node.js cũ sử dụng cổng 5000; nếu chạy đồng thời cần chọn cổng khác
+# cho ứng dụng mới và thống nhất địa chỉ API với frontend.
+# Cấu hình token, cổng thanh toán hoặc MongoDB chỉ bổ sung khi nhóm chọn sử dụng.
