@@ -71,6 +71,10 @@ CREATE TABLE Account (
     Address NVARCHAR(255) NULL,
     CCCD VARCHAR(20) NULL UNIQUE,
     Date_Of_Birth DATE NULL,
+    Created_At DATETIME2 NOT NULL DEFAULT GETDATE(),
+    Created_By INT NULL,
+    Updated_At DATETIME2 NOT NULL DEFAULT GETDATE(),
+    Updated_By INT NULL,
     CONSTRAINT CK_Account_Status CHECK (Account_Status IN (N'ACTIVE', N'SUSPENDED', N'LOCKED', N'INACTIVE')),
     CONSTRAINT CK_Account_Gender CHECK (Gender IN (N'Nam', N'Nữ', 'Nam', 'Nu', 'Male', 'Female', 'Other', N'Khác'))
 );
@@ -125,6 +129,10 @@ CREATE TABLE Cart (
     Cart_ID INT IDENTITY(1,1) PRIMARY KEY,
     Total_product INT NOT NULL DEFAULT 0,
     Buyer_ID INT NOT NULL UNIQUE,
+    Created_At DATETIME2 NOT NULL DEFAULT GETDATE(),
+    Created_By INT NULL,
+    Updated_At DATETIME2 NOT NULL DEFAULT GETDATE(),
+    Updated_By INT NULL,
     CONSTRAINT FK_Cart_Buyer FOREIGN KEY (Buyer_ID) REFERENCES Buyer(Account_ID) ON DELETE CASCADE,
     CONSTRAINT CK_Cart_TotalProduct CHECK (Total_product >= 0)
 );
@@ -136,6 +144,10 @@ CREATE TABLE Category (
     Category_Name NVARCHAR(100) NOT NULL UNIQUE,
     Parent_Category_ID INT NULL,
     Admin_ID INT NULL,
+    Created_At DATETIME2 NOT NULL DEFAULT GETDATE(),
+    Created_By INT NULL,
+    Updated_At DATETIME2 NOT NULL DEFAULT GETDATE(),
+    Updated_By INT NULL,
     CONSTRAINT FK_Category_Parent FOREIGN KEY (Parent_Category_ID) REFERENCES Category(Category_ID),
     CONSTRAINT FK_Category_Admin FOREIGN KEY (Admin_ID) REFERENCES Admin(Account_ID)
 );
@@ -149,6 +161,10 @@ CREATE TABLE Product (
     Product_Name NVARCHAR(255) NOT NULL,
     Description NVARCHAR(MAX) NULL,
     Manufacturer NVARCHAR(100) NULL,
+    Created_At DATETIME2 NOT NULL DEFAULT GETDATE(),
+    Created_By INT NULL,
+    Updated_At DATETIME2 NOT NULL DEFAULT GETDATE(),
+    Updated_By INT NULL,
     CONSTRAINT FK_Product_Seller FOREIGN KEY (Seller_ID) REFERENCES Seller(Account_ID),
     CONSTRAINT FK_Product_Category FOREIGN KEY (Category_ID) REFERENCES Category(Category_ID)
 );
@@ -222,6 +238,10 @@ CREATE TABLE Shipping_Provider (
     Address NVARCHAR(255) NULL,
     Admin_ID INT NULL,
     Base_Shipping_Fee DECIMAL(18,2) NOT NULL DEFAULT 0,
+    Created_At DATETIME2 NOT NULL DEFAULT GETDATE(),
+    Created_By INT NULL,
+    Updated_At DATETIME2 NOT NULL DEFAULT GETDATE(),
+    Updated_By INT NULL,
     CONSTRAINT FK_ShippingProvider_Admin FOREIGN KEY (Admin_ID) REFERENCES Admin(Account_ID),
     CONSTRAINT CK_Provider_Fee CHECK (Base_Shipping_Fee >= 0)
 );
@@ -236,6 +256,10 @@ CREATE TABLE Promotion (
     Min_Bill DECIMAL(18,2) NOT NULL DEFAULT 0,
     Type NVARCHAR(50) NOT NULL, -- 'COUPON' hoặc 'VOUCHER'
     Seller_ID INT NOT NULL,
+    Created_At DATETIME2 NOT NULL DEFAULT GETDATE(),
+    Created_By INT NULL,
+    Updated_At DATETIME2 NOT NULL DEFAULT GETDATE(),
+    Updated_By INT NULL,
     CONSTRAINT FK_Promotion_Seller FOREIGN KEY (Seller_ID) REFERENCES Seller(Account_ID),
     CONSTRAINT CK_Promotion_Quantity CHECK (Quantity >= 0),
     CONSTRAINT CK_Promotion_MinBill CHECK (Min_Bill >= 0),
@@ -280,6 +304,10 @@ CREATE TABLE [Order] (
     Total_Price DECIMAL(18,2) NOT NULL DEFAULT 0,
     Delivery_Address NVARCHAR(255) NOT NULL,
     Buyer_ID INT NOT NULL,
+    Created_At DATETIME2 NOT NULL DEFAULT GETDATE(),
+    Created_By INT NULL,
+    Updated_At DATETIME2 NOT NULL DEFAULT GETDATE(),
+    Updated_By INT NULL,
     CONSTRAINT FK_Order_Buyer FOREIGN KEY (Buyer_ID) REFERENCES Buyer(Account_ID),
     CONSTRAINT CK_Order_TotalPrice CHECK (Total_Price >= 0)
 );
@@ -339,7 +367,10 @@ CREATE TABLE Evaluation (
     Variant_ID INT NOT NULL,
     Rating INT NOT NULL,
     Content NVARCHAR(MAX) NULL,
-    Create_Time DATETIME2 NOT NULL DEFAULT GETDATE(),
+    Created_At DATETIME2 NOT NULL DEFAULT GETDATE(),
+    Created_By INT NULL,
+    Updated_At DATETIME2 NOT NULL DEFAULT GETDATE(),
+    Updated_By INT NULL,
     CONSTRAINT FK_Evaluation_Buyer FOREIGN KEY (Buyer_ID) REFERENCES Buyer(Account_ID),
     CONSTRAINT FK_Evaluation_Variant FOREIGN KEY (Variant_ID) REFERENCES Product_Variant(Variant_ID),
     CONSTRAINT CK_Evaluation_Rating CHECK (Rating BETWEEN 1 AND 5)
@@ -364,8 +395,11 @@ CREATE TABLE Report (
     Reason NVARCHAR(255) NOT NULL,
     Description NVARCHAR(MAX) NULL,
     Status NVARCHAR(50) NOT NULL DEFAULT N'PENDING',
-    Created_At DATETIME2 NOT NULL DEFAULT GETDATE(),
     Resolved_At DATETIME2 NULL,
+    Created_At DATETIME2 NOT NULL DEFAULT GETDATE(),
+    Created_By INT NULL,
+    Updated_At DATETIME2 NOT NULL DEFAULT GETDATE(),
+    Updated_By INT NULL,
     CONSTRAINT FK_Report_Reporter FOREIGN KEY (Reporter_ID) REFERENCES Account(Account_ID),
     CONSTRAINT FK_Report_Reported FOREIGN KEY (Reported_ID) REFERENCES Account(Account_ID),
     CONSTRAINT FK_Report_Admin FOREIGN KEY (Admin_ID) REFERENCES Admin(Account_ID),

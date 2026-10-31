@@ -63,14 +63,14 @@ GO
 PRINT N'[*] Đang nạp dữ liệu mẫu mới...';
 
 -- 1. Account (Admin, Sellers, Buyers)
-INSERT INTO Account (Username, password, FName, LName, Phone, Account_Status, Email, Gender, avatar, Address, CCCD, Date_Of_Birth)
+INSERT INTO Account (Username, password, FName, LName, Phone, Account_Status, Email, Gender, avatar, Address, CCCD, Date_Of_Birth, Created_At, Created_By, Updated_At, Updated_By)
 VALUES
-(N'admin_root', N'$2a$10$hashed_admin_pwd', N'Văn', N'Quản Trị', '0901000001', N'ACTIVE', 'admin@bkpee.vn', N'Nam', N'https://bkpee.vn/img/admin.png', N'Quận 10, TP.HCM', '079090000001', '1995-05-15'),
-(N'seller_fahasa', N'$2a$10$hashed_seller_pwd1', N'Thị', N'Nhà Sách', '0902000002', N'ACTIVE', 'fahasa@bkpee.vn', N'Nữ', N'https://bkpee.vn/img/fahasa.png', N'Quận 1, TP.HCM', '079090000002', '1990-10-20'),
-(N'seller_coolmate', N'$2a$10$hashed_seller_pwd2', N'Đức', N'Thời Trang', '0903000003', N'ACTIVE', 'coolmate@bkpee.vn', N'Nam', N'https://bkpee.vn/img/coolmate.png', N'Hà Đông, Hà Nội', '079090000003', '1992-03-12'),
-(N'seller_cellphones', N'$2a$10$hashed_seller_pwd3', N'Thành', N'Điện Máy', '0904000004', N'ACTIVE', 'cellphones@bkpee.vn', N'Nam', N'https://bkpee.vn/img/cellphones.png', N'Bình Thạnh, TP.HCM', '079090000004', '1988-08-08'),
-(N'buyer_hienle', N'$2a$10$hashed_buyer_pwd1', N'Thúy', N'Lê Hiền', '0905000005', N'ACTIVE', 'thuyhien@bkpee.vn', N'Nữ', N'https://bkpee.vn/img/buyer1.png', N'Thủ Đức, TP.HCM', '079090000005', '2003-07-25'),
-(N'buyer_khoinguyen', N'$2a$10$hashed_buyer_pwd2', N'Khôi', N'Nguyễn', '0906000006', N'ACTIVE', 'khoinguyen@bkpee.vn', N'Nam', N'https://bkpee.vn/img/buyer2.png', N'Quận 7, TP.HCM', '079090000006', '2002-11-14');
+(N'admin_root',      N'$2a$10$hashed_admin_pwd',    N'Văn',   N'Quản Trị', '0901000001', N'ACTIVE', 'admin@bkpee.vn',        N'Nam', N'https://bkpee.vn/img/admin.png',      N'Quận 10, TP.HCM',       '079090000001', '1995-05-15', GETDATE(), 1, GETDATE(), 1),
+(N'seller_fahasa',   N'$2a$10$hashed_seller_pwd1',  N'Thị',   N'Nhà Sách', '0902000002', N'ACTIVE', 'fahasa@bkpee.vn',        N'Nữ', N'https://bkpee.vn/img/fahasa.png',     N'Quận 1, TP.HCM',        '079090000002', '1990-10-20', GETDATE(), 1, GETDATE(), 1),
+(N'seller_coolmate', N'$2a$10$hashed_seller_pwd2',  N'Đức',   N'Thời Trang', '0903000003', N'ACTIVE', 'coolmate@bkpee.vn',      N'Nam', N'https://bkpee.vn/img/coolmate.png',   N'Hà Đông, Hà Nội',      '079090000003', '1992-03-12', GETDATE(), 1, GETDATE(), 1),
+(N'seller_cellphones',N'$2a$10$hashed_seller_pwd3', N'Thành', N'Điện Máy', '0904000004', N'ACTIVE', 'cellphones@bkpee.vn',   N'Nam', N'https://bkpee.vn/img/cellphones.png', N'Bình Thạnh, TP.HCM',    '079090000004', '1988-08-08', GETDATE(), 1, GETDATE(), 1),
+(N'buyer_hienle',    N'$2a$10$hashed_buyer_pwd1',   N'Thúy',  N'Lê Hiền', '0905000005', N'ACTIVE', 'thuyhien@bkpee.vn',      N'Nữ', N'https://bkpee.vn/img/buyer1.png',    N'Thủ Đức, TP.HCM',       '079090000005', '2003-07-25', GETDATE(), 1, GETDATE(), 1),
+(N'buyer_khoinguyen',N'$2a$10$hashed_buyer_pwd2',   N'Khôi',  N'Nguyễn',  '0906000006', N'ACTIVE', 'khoinguyen@bkpee.vn',    N'Nam', N'https://bkpee.vn/img/buyer2.png',    N'Quận 7, TP.HCM',        '079090000006', '2002-11-14', GETDATE(), 1, GETDATE(), 1);
 GO
 
 -- 2. Phân quyền User và Admin
@@ -103,33 +103,33 @@ INSERT INTO Buyer_Infor (Buyer_ID, Address, Receiver_Name, Phone) VALUES
 GO
 
 -- 5. Giỏ hàng cho Buyers
-INSERT INTO Cart (Total_product, Buyer_ID) VALUES
-(0, 5),
-(0, 6);
+INSERT INTO Cart (Total_product, Buyer_ID, Created_At, Created_By, Updated_At, Updated_By) VALUES
+(0, 5, GETDATE(), 5, GETDATE(), 5),
+(0, 6, GETDATE(), 6, GETDATE(), 6);
 GO
 
 -- 6. Shipping Provider
-INSERT INTO Shipping_Provider (Provider_Name, Phone, Address, Admin_ID, Base_Shipping_Fee) VALUES
-(N'Giao Hàng Tiết Kiệm (GHTK)', '19006092', N'Tòa nhà VTV, Cầu Giấy, Hà Nội', 1, 22000),
-(N'Giao Hàng Nhanh (GHN)', '1900636677', N'Tân Bình, TP.HCM', 1, 25000),
-(N'Viettel Post', '19008095', N'Ba Đình, Hà Nội', 1, 20000);
+INSERT INTO Shipping_Provider (Provider_Name, Phone, Address, Admin_ID, Base_Shipping_Fee, Created_At, Created_By, Updated_At, Updated_By) VALUES
+(N'Giao Hàng Tiết Kiệm (GHTK)', '19006092', N'Tòa nhà VTV, Cầu Giấy, Hà Nội', 1, 22000, GETDATE(), 1, GETDATE(), 1),
+(N'Giao Hàng Nhanh (GHN)',        '1900636677', N'Tân Bình, TP.HCM',                1, 25000, GETDATE(), 1, GETDATE(), 1),
+(N'Viettel Post',                  '19008095',   N'Ba Đình, Hà Nội',                1, 20000, GETDATE(), 1, GETDATE(), 1);
 GO
 
 -- 7. Danh mục (Cây đệ quy)
-INSERT INTO Category (Category_Name, Parent_Category_ID, Admin_ID) VALUES
-(N'Sách & Văn Phòng Phẩm', NULL, 1),      -- Category 1
-(N'Thời Trang & May Mặc', NULL, 1),       -- Category 2
-(N'Thiết Bị Điện Tử', NULL, 1),           -- Category 3
-(N'Sách Công Nghệ & Kỹ Thuật', 1, 1),     -- Category 4 (con của 1)
-(N'Áo Thun Nam Nữ', 2, 1),                -- Category 5 (con của 2)
-(N'Tai Nghe & Phụ Kiện', 3, 1);           -- Category 6 (con của 3)
+INSERT INTO Category (Category_Name, Parent_Category_ID, Admin_ID, Created_At, Created_By, Updated_At, Updated_By) VALUES
+(N'Sách & Văn Phòng Phẩm', NULL, 1, GETDATE(), 1, GETDATE(), 1),   -- Category 1
+(N'Thời Trang & May Mặc',   NULL, 1, GETDATE(), 1, GETDATE(), 1),   -- Category 2
+(N'Thiết Bị Điện Tử',       NULL, 1, GETDATE(), 1, GETDATE(), 1),   -- Category 3
+(N'Sách Công Nghệ & Kỹ Thuật', 1,    1, GETDATE(), 1, GETDATE(), 1),   -- Category 4 (con của 1)
+(N'Áo Thun Nam Nữ',          2,    1, GETDATE(), 1, GETDATE(), 1),   -- Category 5 (con của 2)
+(N'Tai Nghe & Phụ Kiện',     3,    1, GETDATE(), 1, GETDATE(), 1);  -- Category 6 (con của 3)
 GO
 
 -- 8. Sản phẩm & Bảng con chuyên biệt
-INSERT INTO Product (Seller_ID, Category_ID, Product_Name, Description, Manufacturer) VALUES
-(2, 4, N'Giáo trình Cơ Sở Dữ Liệu (Database Systems)', N'Sách tham khảo chuẩn quốc tế biên soạn bởi ĐHQG-HCM.', N'NXB Đại học Quốc gia'),
-(3, 5, N'Áo Thun Thể Thao Nam QuickDry Chạy Bộ', N'Chất liệu Polyester tái chế siêu nhẹ, thoáng khí và khử mùi tối ưu.', N'Coolmate Vietnam'),
-(4, 6, N'Tai Nghe Chống Ồn Sony WH-1000XM5', N'Tai nghe Bluetooth cao cấp với công nghệ chống ồn chủ động hàng đầu thế giới.', N'Sony Corporation');
+INSERT INTO Product (Seller_ID, Category_ID, Product_Name, Description, Manufacturer, Created_At, Created_By, Updated_At, Updated_By) VALUES
+(2, 4, N'Giáo trình Cơ Sở Dữ Liệu (Database Systems)', N'Sách tham khảo chuẩn quốc tế biên soạn bởi ĐHQG-HCM.', N'NXB Đại học Quốc gia', GETDATE(), 2, GETDATE(), 2),
+(3, 5, N'Áo Thun Thể Thao Nam QuickDry Chạy Bộ', N'Chất liệu Polyester tái chế siêu nhẹ, thoáng khí và khử mùi tối ưu.', N'Coolmate Vietnam', GETDATE(), 3, GETDATE(), 3),
+(4, 6, N'Tai Nghe Chống Ồn Sony WH-1000XM5', N'Tai nghe Bluetooth cao cấp với công nghệ chống ồn chủ động hàng đầu thế giới.', N'Sony Corporation', GETDATE(), 4, GETDATE(), 4);
 
 INSERT INTO Books (Product_ID, Publisher) VALUES (1, N'Nhà Xuất Bản ĐHQG TP.HCM');
 INSERT INTO Book_Author (Product_ID, Author_Name) VALUES 
@@ -159,9 +159,9 @@ UPDATE Cart SET Total_product = 3 WHERE Cart_ID = 1;
 GO
 
 -- 11. Khuyến mãi
-INSERT INTO Promotion (Quantity, Start_Date, Expiration_Date, Min_Bill, Type, Seller_ID) VALUES
-(100, '2026-10-01 00:00:00', '2026-12-31 23:59:59', 200000, 'COUPON', 2),
-(50,  '2026-10-15 00:00:00', '2026-11-30 23:59:59', 300000, 'VOUCHER', 3);
+INSERT INTO Promotion (Quantity, Start_Date, Expiration_Date, Min_Bill, Type, Seller_ID, Created_At, Created_By, Updated_At, Updated_By) VALUES
+(100, '2026-10-01 00:00:00', '2026-12-31 23:59:59', 200000, 'COUPON',  2, GETDATE(), 2, GETDATE(), 2),
+(50,  '2026-10-15 00:00:00', '2026-11-30 23:59:59', 300000, 'VOUCHER', 3, GETDATE(), 3, GETDATE(), 3);
 
 INSERT INTO Coupon (Promotion_ID, percent_discount, max_discount) VALUES (1, 15.00, 50000);
 INSERT INTO Voucher (Promotion_ID, voucher_value) VALUES (2, 30000);
@@ -173,12 +173,12 @@ INSERT INTO Promotion_Apply (Variant_ID, Promotion_ID) VALUES
 GO
 
 -- 12. Đơn hàng, Shop Order, Shop Order Item
-INSERT INTO [Order] (Order_Time, Total_Price, Delivery_Address, Buyer_ID) VALUES
-('2026-10-29 14:30:00', 540000, N'KTX Khu A ĐHQG TP.HCM, Dĩ An, Bình Dương', 5);
+INSERT INTO [Order] (Order_Time, Total_Price, Delivery_Address, Buyer_ID, Created_At, Created_By, Updated_At, Updated_By) VALUES
+('2026-10-29 14:30:00', 540000, N'KTX Khu A ĐHQG TP.HCM, Dĩ An, Bình Dương', 5, '2026-10-29 14:30:00', 5, '2026-10-29 14:30:00', 5);
 
 INSERT INTO Shop_Order (Order_ID, Seller_ID, Provider_ID, Tracking_Number, Delivery_Status, Shipping_Fee, Shipped_At, Delivered_At) VALUES
 (1, 2, 1, 'GHTK-FAHASA-001', N'DELIVERED', 22000, '2026-10-29 16:00:00', '2026-10-30 09:30:00'),
-(1, 3, 2, 'GHN-COOLMATE-002', N'SHIPPING', 25000, '2026-10-29 17:00:00', NULL);
+(1, 3, 2, 'GHN-COOLMATE-002', N'SHIPPING',  25000, '2026-10-29 17:00:00', NULL);
 
 INSERT INTO Shop_Order_Item (Shop_Order_ID, Variant_ID, Quantity, Purchase_Price) VALUES
 (1, 1, 1, 120000),
@@ -191,15 +191,15 @@ INSERT INTO Payment_Information (Order_ID, Transaction_Code, Payment_Method, Pay
 GO
 
 -- 14. Đánh giá & Khiếu nại
-INSERT INTO Evaluation (Buyer_ID, Variant_ID, Rating, Content, Create_Time) VALUES
-(5, 1, 5, N'Sách in rất đẹp, bìa dày dặn, kiến thức chuẩn giáo trình DBMS của trường!', '2026-10-30 10:00:00');
+INSERT INTO Evaluation (Buyer_ID, Variant_ID, Rating, Content, Created_At, Created_By, Updated_At, Updated_By) VALUES
+(5, 1, 5, N'Sách in rất đẹp, bìa dày dặn, kiến thức chuẩn giáo trình DBMS của trường!', '2026-10-30 10:00:00', 5, '2026-10-30 10:00:00', 5);
 
 INSERT INTO Evaluation_Image (Evaluate_ID, Image) VALUES
 (1, 'https://bkpee.vn/img/review/sach-thuc-te-1.jpg'),
 (1, 'https://bkpee.vn/img/review/sach-thuc-te-2.jpg');
 
-INSERT INTO Report (Reporter_ID, Reported_ID, Admin_ID, Reason, Description, Status, Created_At, Resolved_At) VALUES
-(5, 4, 1, N'Tư vấn sai thông tin sản phẩm', N'Shop hẹn bảo hành 24 tháng nhưng tem chỉ ghi 12 tháng.', N'RESOLVED', '2026-10-28 08:00:00', '2026-10-28 17:00:00');
+INSERT INTO Report (Reporter_ID, Reported_ID, Admin_ID, Reason, Description, Status, Resolved_At, Created_At, Created_By, Updated_At, Updated_By) VALUES
+(5, 4, 1, N'Tư vấn sai thông tin sản phẩm', N'Shop hẹn bảo hành 24 tháng nhưng tem chỉ ghi 12 tháng.', N'RESOLVED', '2026-10-28 17:00:00', '2026-10-28 08:00:00', 5, '2026-10-28 17:00:00', 1);
 
 INSERT INTO Report_Image (Report_ID, Image) VALUES
 (1, 'https://bkpee.vn/img/report/anh-chup-tem-bao-hanh.jpg');

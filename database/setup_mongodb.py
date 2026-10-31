@@ -57,6 +57,7 @@ def seed_small(db):
     setup_indexes(db)
     
     # 1. Accounts (Admin 1, Sellers 2, 3, 4, Buyers 5, 6)
+    _now = datetime.now()
     db.accounts.insert_many([
         {
             "_id": 1,
@@ -73,7 +74,11 @@ def seed_small(db):
             "date_of_birth": datetime(1995, 5, 15),
             "account_status": "ACTIVE",
             "roles": ["ADMIN"],
-            "admin_profile": { "admin_role": "SUPER_ADMIN" }
+            "admin_profile": { "admin_role": "SUPER_ADMIN" },
+            "created_at": _now,
+            "created_by": 1,
+            "updated_at": _now,
+            "updated_by": 1
         },
         {
             "_id": 2,
@@ -94,7 +99,11 @@ def seed_small(db):
             "seller_profile": {
                 "shop_name": "Fahasa Official Store",
                 "bank_account_number": "190345678901"
-            }
+            },
+            "created_at": _now,
+            "created_by": 1,
+            "updated_at": _now,
+            "updated_by": 1
         },
         {
             "_id": 3,
@@ -115,7 +124,11 @@ def seed_small(db):
             "seller_profile": {
                 "shop_name": "Coolmate Activewear",
                 "bank_account_number": "190345678902"
-            }
+            },
+            "created_at": _now,
+            "created_by": 1,
+            "updated_at": _now,
+            "updated_by": 1
         },
         {
             "_id": 4,
@@ -136,7 +149,11 @@ def seed_small(db):
             "seller_profile": {
                 "shop_name": "CellphoneS Flagship",
                 "bank_account_number": "190345678903"
-            }
+            },
+            "created_at": _now,
+            "created_by": 1,
+            "updated_at": _now,
+            "updated_by": 1
         },
         {
             "_id": 5,
@@ -169,7 +186,11 @@ def seed_small(db):
                         "is_default": False
                     }
                 ]
-            }
+            },
+            "created_at": _now,
+            "created_by": 5,
+            "updated_at": _now,
+            "updated_by": 5
         },
         {
             "_id": 6,
@@ -196,25 +217,29 @@ def seed_small(db):
                         "is_default": True
                     }
                 ]
-            }
+            },
+            "created_at": _now,
+            "created_by": 6,
+            "updated_at": _now,
+            "updated_by": 6
         }
     ])
     
     # 2. Categories
     db.categories.insert_many([
-        { "_id": 1, "category_name": "Sách & Văn Phòng Phẩm", "parent_category_id": None, "admin_id": 1 },
-        { "_id": 2, "category_name": "Thời Trang & May Mặc", "parent_category_id": None, "admin_id": 1 },
-        { "_id": 3, "category_name": "Thiết Bị Điện Tử", "parent_category_id": None, "admin_id": 1 },
-        { "_id": 4, "category_name": "Sách Công Nghệ & Kỹ Thuật", "parent_category_id": 1, "admin_id": 1 },
-        { "_id": 5, "category_name": "Áo Thun Nam Nữ", "parent_category_id": 2, "admin_id": 1 },
-        { "_id": 6, "category_name": "Tai Nghe & Phụ Kiện", "parent_category_id": 3, "admin_id": 1 }
+        { "_id": 1, "category_name": "Sách & Văn Phòng Phẩm", "parent_category_id": None, "admin_id": 1, "created_at": _now, "created_by": 1, "updated_at": _now, "updated_by": 1 },
+        { "_id": 2, "category_name": "Thời Trang & May Mặc", "parent_category_id": None, "admin_id": 1, "created_at": _now, "created_by": 1, "updated_at": _now, "updated_by": 1 },
+        { "_id": 3, "category_name": "Thiết Bị Điện Tử", "parent_category_id": None, "admin_id": 1, "created_at": _now, "created_by": 1, "updated_at": _now, "updated_by": 1 },
+        { "_id": 4, "category_name": "Sách Công Nghệ & Kỹ Thuật", "parent_category_id": 1, "admin_id": 1, "created_at": _now, "created_by": 1, "updated_at": _now, "updated_by": 1 },
+        { "_id": 5, "category_name": "Áo Thun Nam Nữ", "parent_category_id": 2, "admin_id": 1, "created_at": _now, "created_by": 1, "updated_at": _now, "updated_by": 1 },
+        { "_id": 6, "category_name": "Tai Nghe & Phụ Kiện", "parent_category_id": 3, "admin_id": 1, "created_at": _now, "created_by": 1, "updated_at": _now, "updated_by": 1 }
     ])
     
     # 3. Shipping Providers
     db.shipping_providers.insert_many([
-        { "_id": 1, "provider_name": "Giao Hàng Tiết Kiệm (GHTK)", "phone": "19006092", "address": "Tòa nhà VTV, Cầu Giấy, Hà Nội", "admin_id": 1, "base_shipping_fee": 22000 },
-        { "_id": 2, "provider_name": "Giao Hàng Nhanh (GHN)", "phone": "1900636677", "address": "Tân Bình, TP.HCM", "admin_id": 1, "base_shipping_fee": 25000 },
-        { "_id": 3, "provider_name": "Viettel Post", "phone": "19008095", "address": "Ba Đình, Hà Nội", "admin_id": 1, "base_shipping_fee": 20000 }
+        { "_id": 1, "provider_name": "Giao Hàng Tiết Kiệm (GHTK)", "phone": "19006092", "address": "Tòa nhà VTV, Cầu Giấy, Hà Nội", "admin_id": 1, "base_shipping_fee": 22000, "created_at": _now, "created_by": 1, "updated_at": _now, "updated_by": 1 },
+        { "_id": 2, "provider_name": "Giao Hàng Nhanh (GHN)", "phone": "1900636677", "address": "Tân Bình, TP.HCM", "admin_id": 1, "base_shipping_fee": 25000, "created_at": _now, "created_by": 1, "updated_at": _now, "updated_by": 1 },
+        { "_id": 3, "provider_name": "Viettel Post", "phone": "19008095", "address": "Ba Đình, Hà Nội", "admin_id": 1, "base_shipping_fee": 20000, "created_at": _now, "created_by": 1, "updated_at": _now, "updated_by": 1 }
     ])
     
     # 4. Products (Product 1: Sách, Product 2: Quần áo, Product 3: Điện tử)
@@ -237,7 +262,11 @@ def seed_small(db):
             ],
             "min_price": 120000,
             "max_price": 180000,
-            "total_stock": 200
+            "total_stock": 200,
+            "created_at": _now,
+            "created_by": 2,
+            "updated_at": _now,
+            "updated_by": 2
         },
         {
             "_id": 2,
@@ -256,7 +285,11 @@ def seed_small(db):
             ],
             "min_price": 199000,
             "max_price": 199000,
-            "total_stock": 120
+            "total_stock": 120,
+            "created_at": _now,
+            "created_by": 3,
+            "updated_at": _now,
+            "updated_by": 3
         },
         {
             "_id": 3,
@@ -275,7 +308,11 @@ def seed_small(db):
             ],
             "min_price": 7990000,
             "max_price": 7990000,
-            "total_stock": 25
+            "total_stock": 25,
+            "created_at": _now,
+            "created_by": 4,
+            "updated_at": _now,
+            "updated_by": 4
         }
     ])
     
@@ -286,15 +323,23 @@ def seed_small(db):
             "buyer_id": 5,
             "total_product": 3,
             "items": [
-                { "variant_id": 1, "product_id": 1, "quantity": 1, "added_at": datetime.now() },
-                { "variant_id": 3, "product_id": 2, "quantity": 2, "added_at": datetime.now() }
-            ]
+                { "variant_id": 1, "product_id": 1, "quantity": 1, "added_at": _now },
+                { "variant_id": 3, "product_id": 2, "quantity": 2, "added_at": _now }
+            ],
+            "created_at": _now,
+            "created_by": 5,
+            "updated_at": _now,
+            "updated_by": 5
         },
         {
             "_id": 2,
             "buyer_id": 6,
             "total_product": 0,
-            "items": []
+            "items": [],
+            "created_at": _now,
+            "created_by": 6,
+            "updated_at": _now,
+            "updated_by": 6
         }
     ])
     
@@ -309,7 +354,11 @@ def seed_small(db):
             "expiration_date": datetime(2026, 12, 31),
             "min_bill": 200000,
             "discount_config": { "percent_discount": 15.0, "max_discount": 50000 },
-            "applicable_variant_ids": [1, 2]
+            "applicable_variant_ids": [1, 2],
+            "created_at": _now,
+            "created_by": 2,
+            "updated_at": _now,
+            "updated_by": 2
         },
         {
             "_id": 2,
@@ -320,17 +369,22 @@ def seed_small(db):
             "expiration_date": datetime(2026, 11, 30),
             "min_bill": 300000,
             "discount_config": { "voucher_value": 30000 },
-            "applicable_variant_ids": [3]
+            "applicable_variant_ids": [3],
+            "created_at": _now,
+            "created_by": 3,
+            "updated_at": _now,
+            "updated_by": 3
         }
     ])
     
     # 7. Orders
+    _order_time = datetime(2026, 10, 29, 14, 30)
     db.orders.insert_one({
         "_id": 1,
         "buyer_id": 5,
         "buyer_name": "Lê Hiền Thúy",
         "delivery_address": "KTX Khu A ĐHQG TP.HCM, Dĩ An, Bình Dương",
-        "order_time": datetime(2026, 10, 29, 14, 30),
+        "order_time": _order_time,
         "total_price": 540000,
         "shop_orders": [
             {
@@ -367,10 +421,15 @@ def seed_small(db):
             "payment_method": "VNPAY",
             "payment_status": "COMPLETED",
             "payment_time": datetime(2026, 10, 29, 14, 35)
-        }
+        },
+        "created_at": _order_time,
+        "created_by": 5,
+        "updated_at": _order_time,
+        "updated_by": 5
     })
     
     # 8. Evaluations
+    _eval_time = datetime(2026, 10, 30, 10, 0)
     db.evaluations.insert_one({
         "_id": 1,
         "buyer_id": 5,
@@ -382,10 +441,15 @@ def seed_small(db):
             "https://bkpee.vn/img/review/sach-thuc-te-1.jpg",
             "https://bkpee.vn/img/review/sach-thuc-te-2.jpg"
         ],
-        "created_at": datetime(2026, 10, 30, 10, 0)
+        "created_at": _eval_time,
+        "created_by": 5,
+        "updated_at": _eval_time,
+        "updated_by": 5
     })
     
     # 9. Reports
+    _report_created = datetime(2026, 10, 28, 8, 0)
+    _report_resolved = datetime(2026, 10, 28, 17, 0)
     db.reports.insert_one({
         "_id": 1,
         "reporter_id": 5,
@@ -397,8 +461,11 @@ def seed_small(db):
         "evidence_images": [
             "https://bkpee.vn/img/report/anh-chup-tem-bao-hanh.jpg"
         ],
-        "created_at": datetime(2026, 10, 28, 8, 0),
-        "resolved_at": datetime(2026, 10, 28, 17, 0)
+        "resolved_at": _report_resolved,
+        "created_at": _report_created,
+        "created_by": 5,
+        "updated_at": _report_resolved,
+        "updated_by": 1
     })
     
     print("[+] Hoàn tất nạp dữ liệu nhỏ vào MongoDB!")
@@ -428,13 +495,18 @@ def seed_large(db):
             "date_of_birth": datetime(1995, 5, 15),
             "account_status": "ACTIVE",
             "roles": ["ADMIN"],
-            "admin_profile": { "admin_role": "SUPER_ADMIN" }
+            "admin_profile": { "admin_role": "SUPER_ADMIN" },
+            "created_at": now,
+            "created_by": 1,
+            "updated_at": now,
+            "updated_by": 1
         }
     ]
     
     for n in range(1, 2001):
         is_seller = (n <= 200)
         user_id = n + 1
+        acc_created = now - timedelta(days=n % 365)
         acc = {
             "_id": user_id,
             "username": f"seller_{n:04d}" if is_seller else f"buyer_{n:04d}",
@@ -450,7 +522,11 @@ def seed_large(db):
             "date_of_birth": now - timedelta(days=6000 + (n * 13 % 10000)),
             "account_status": "ACTIVE",
             "roles": ["SELLER"] if is_seller else ["BUYER"],
-            "user_profile": { "trust_score": 80 + (n % 21) }
+            "user_profile": { "trust_score": 80 + (n % 21) },
+            "created_at": acc_created,
+            "created_by": 1,
+            "updated_at": acc_created,
+            "updated_by": 1
         }
         if is_seller:
             acc["seller_profile"] = {
@@ -487,7 +563,7 @@ def seed_large(db):
         "Mẹ & Bé", "Sức Khỏe & Sắc Đẹp", "Thể Thao & Du Lịch", "Ô Tô - Xe Máy", "Bách Hóa Online", "Đồ Chơi & Quà Tặng"
     ]
     for i, name in enumerate(parent_names, 1):
-        categories.append({ "_id": i, "category_name": name, "parent_category_id": None, "admin_id": 1 })
+        categories.append({ "_id": i, "category_name": name, "parent_category_id": None, "admin_id": 1, "created_at": now, "created_by": 1, "updated_at": now, "updated_by": 1 })
     
     child_names = [
         "Sách Công Nghệ & Kỹ Thuật", "Sách Kinh Tế & Khởi Nghiệp", "Truyện Tranh & Manga", "Áo Thun Nam Nữ",
@@ -498,22 +574,22 @@ def seed_large(db):
     ]
     for i, name in enumerate(child_names, 11):
         parent_id = ((i - 11) % 10) + 1
-        categories.append({ "_id": i, "category_name": name, "parent_category_id": parent_id, "admin_id": 1 })
+        categories.append({ "_id": i, "category_name": name, "parent_category_id": parent_id, "admin_id": 1, "created_at": now, "created_by": 1, "updated_at": now, "updated_by": 1 })
     db.categories.insert_many(categories, ordered=False)
     
     # 3. Shipping Providers (10 đơn vị)
     print("  -> [3/9] Sinh 10 đơn vị vận chuyển...")
     providers = [
-        { "_id": 1, "provider_name": "Giao Hàng Tiết Kiệm (GHTK)", "phone": "19006092", "address": "Cầu Giấy, Hà Nội", "admin_id": 1, "base_shipping_fee": 22000 },
-        { "_id": 2, "provider_name": "Giao Hàng Nhanh (GHN)", "phone": "1900636677", "address": "Tân Bình, TP.HCM", "admin_id": 1, "base_shipping_fee": 25000 },
-        { "_id": 3, "provider_name": "Viettel Post", "phone": "19008095", "address": "Ba Đình, Hà Nội", "admin_id": 1, "base_shipping_fee": 20000 },
-        { "_id": 4, "provider_name": "VNPost", "phone": "1900545481", "address": "Hoàn Kiếm, Hà Nội", "admin_id": 1, "base_shipping_fee": 18000 },
-        { "_id": 5, "provider_name": "J&T Express", "phone": "19001088", "address": "Bình Thạnh, TP.HCM", "admin_id": 1, "base_shipping_fee": 23000 },
-        { "_id": 6, "provider_name": "Ninja Van", "phone": "1900886877", "address": "Quận 7, TP.HCM", "admin_id": 1, "base_shipping_fee": 24000 },
-        { "_id": 7, "provider_name": "BEST Express", "phone": "19001031", "address": "Bình Tân, TP.HCM", "admin_id": 1, "base_shipping_fee": 21000 },
-        { "_id": 8, "provider_name": "Shopee Xpress", "phone": "19001221", "address": "Thủ Đức, TP.HCM", "admin_id": 1, "base_shipping_fee": 19000 },
-        { "_id": 9, "provider_name": "GrabExpress", "phone": "19001555", "address": "Quận 1, TP.HCM", "admin_id": 1, "base_shipping_fee": 35000 },
-        { "_id": 10, "provider_name": "Ahamove", "phone": "1900545411", "address": "Quận 3, TP.HCM", "admin_id": 1, "base_shipping_fee": 30000 }
+        { "_id": 1, "provider_name": "Giao Hàng Tiết Kiệm (GHTK)", "phone": "19006092", "address": "Cầu Giấy, Hà Nội", "admin_id": 1, "base_shipping_fee": 22000, "created_at": now, "created_by": 1, "updated_at": now, "updated_by": 1 },
+        { "_id": 2, "provider_name": "Giao Hàng Nhanh (GHN)", "phone": "1900636677", "address": "Tân Bình, TP.HCM", "admin_id": 1, "base_shipping_fee": 25000, "created_at": now, "created_by": 1, "updated_at": now, "updated_by": 1 },
+        { "_id": 3, "provider_name": "Viettel Post", "phone": "19008095", "address": "Ba Đình, Hà Nội", "admin_id": 1, "base_shipping_fee": 20000, "created_at": now, "created_by": 1, "updated_at": now, "updated_by": 1 },
+        { "_id": 4, "provider_name": "VNPost", "phone": "1900545481", "address": "Hoàn Kiếm, Hà Nội", "admin_id": 1, "base_shipping_fee": 18000, "created_at": now, "created_by": 1, "updated_at": now, "updated_by": 1 },
+        { "_id": 5, "provider_name": "J&T Express", "phone": "19001088", "address": "Bình Thạnh, TP.HCM", "admin_id": 1, "base_shipping_fee": 23000, "created_at": now, "created_by": 1, "updated_at": now, "updated_by": 1 },
+        { "_id": 6, "provider_name": "Ninja Van", "phone": "1900886877", "address": "Quận 7, TP.HCM", "admin_id": 1, "base_shipping_fee": 24000, "created_at": now, "created_by": 1, "updated_at": now, "updated_by": 1 },
+        { "_id": 7, "provider_name": "BEST Express", "phone": "19001031", "address": "Bình Tân, TP.HCM", "admin_id": 1, "base_shipping_fee": 21000, "created_at": now, "created_by": 1, "updated_at": now, "updated_by": 1 },
+        { "_id": 8, "provider_name": "Shopee Xpress", "phone": "19001221", "address": "Thủ Đức, TP.HCM", "admin_id": 1, "base_shipping_fee": 19000, "created_at": now, "created_by": 1, "updated_at": now, "updated_by": 1 },
+        { "_id": 9, "provider_name": "GrabExpress", "phone": "19001555", "address": "Quận 1, TP.HCM", "admin_id": 1, "base_shipping_fee": 35000, "created_at": now, "created_by": 1, "updated_at": now, "updated_by": 1 },
+        { "_id": 10, "provider_name": "Ahamove", "phone": "1900545411", "address": "Quận 3, TP.HCM", "admin_id": 1, "base_shipping_fee": 30000, "created_at": now, "created_by": 1, "updated_at": now, "updated_by": 1 }
     ]
     db.shipping_providers.insert_many(providers, ordered=False)
     
@@ -543,6 +619,7 @@ def seed_large(db):
             { "variant_id": (n - 1) * 3 + 3, "variant_name": "Phiên bản Premium", "price": base_price * 2.0, "quantity_stock": 30, "is_active": True, "image": f"https://bkpee.vn/img/p_{n}_3.png" }
         ]
         
+        prod_created = now - timedelta(days=n % 300)
         products.append({
             "_id": n,
             "seller_id": seller_id,
@@ -557,7 +634,10 @@ def seed_large(db):
             "max_price": base_price * 2.0,
             "total_stock": 180,
             "rating_avg": 4.5,
-            "created_at": now - timedelta(days=n % 300)
+            "created_at": prod_created,
+            "created_by": seller_id,
+            "updated_at": prod_created,
+            "updated_by": seller_id
         })
         
     db.products.insert_many(products, ordered=False)
@@ -579,16 +659,21 @@ def seed_large(db):
                 "voucher_value": 20000 + (n % 10) * 10000
             }
             
+        promo_seller_id = 2 + (n % 200)
         promotions.append({
             "_id": n,
-            "seller_id": 2 + (n % 200),
+            "seller_id": promo_seller_id,
             "type": p_type,
             "quantity": 100 + (n * 5 % 500),
             "start_date": datetime(2026, 1, 1),
             "expiration_date": datetime(2026, 12, 31, 23, 59, 59),
             "min_bill": 100000 + (n % 10) * 50000,
             "discount_config": discount_cfg,
-            "applicable_variant_ids": [(n * 17 % 8500 + 1), ((n * 17 + 5) % 8500 + 1)]
+            "applicable_variant_ids": [(n * 17 % 8500 + 1), ((n * 17 + 5) % 8500 + 1)],
+            "created_at": now,
+            "created_by": promo_seller_id,
+            "updated_at": now,
+            "updated_by": promo_seller_id
         })
     db.promotions.insert_many(promotions, ordered=False)
     
@@ -616,7 +701,11 @@ def seed_large(db):
             "_id": n,
             "buyer_id": buyer_id,
             "total_product": sum(it["quantity"] for it in items),
-            "items": items
+            "items": items,
+            "created_at": now,
+            "created_by": buyer_id,
+            "updated_at": now,
+            "updated_by": buyer_id
         })
     db.carts.insert_many(carts, ordered=False)
     
@@ -690,7 +779,11 @@ def seed_large(db):
                 "payment_method": ["COD", "VNPAY", "MOMO", "BANKING"][n % 4],
                 "payment_status": "FAILED" if (n % 6 == 3) else "COMPLETED",
                 "payment_time": order_time + timedelta(minutes=5)
-            }
+            },
+            "created_at": order_time,
+            "created_by": buyer_id,
+            "updated_at": order_time,
+            "updated_by": buyer_id
         })
         
     db.orders.insert_many(orders, ordered=False)
@@ -699,9 +792,11 @@ def seed_large(db):
     print("  -> [8/9] Sinh 6.000 bài đánh giá...")
     evals = []
     for n in range(1, 6001):
+        eval_buyer_id = 202 + (n % 1800)
+        eval_created = now - timedelta(days=n % 180)
         evals.append({
             "_id": n,
-            "buyer_id": 202 + (n % 1800),
+            "buyer_id": eval_buyer_id,
             "variant_id": 1 + (n * 7 % 8500),
             "product_id": 1 + (n % 3000),
             "rating": 3 + (n % 3),
@@ -711,7 +806,10 @@ def seed_large(db):
                 "Dùng rất ưng ý, sẽ ủng hộ shop tiếp vào lần sau ạ!"
             ][n % 3],
             "images": [f"https://bkpee.vn/img/review/{n}_1.jpg"] if (n % 2 == 0) else [],
-            "created_at": now - timedelta(days=n % 180)
+            "created_at": eval_created,
+            "created_by": eval_buyer_id,
+            "updated_at": eval_created,
+            "updated_by": eval_buyer_id
         })
     db.evaluations.insert_many(evals, ordered=False)
     
@@ -719,9 +817,13 @@ def seed_large(db):
     print("  -> [9/9] Sinh 1.000 phiếu khiếu nại vi phạm...")
     reports = []
     for n in range(1, 1001):
+        report_reporter_id = 202 + (n % 1800)
+        report_created = now - timedelta(days=n % 90)
+        is_resolved = (n % 3 == 2)
+        report_updated = now - timedelta(days=1) if is_resolved else report_created
         reports.append({
             "_id": n,
-            "reporter_id": 202 + (n % 1800),
+            "reporter_id": report_reporter_id,
             "reported_account_id": 2 + (n % 200),
             "admin_id": 1,
             "reason": [
@@ -733,8 +835,11 @@ def seed_large(db):
             "description": f"Nội dung khiếu nại chi tiết từ người dùng số {n}",
             "status": ["PENDING", "IN_PROGRESS", "RESOLVED"][n % 3],
             "evidence_images": [f"https://bkpee.vn/img/report/evidence_{n}.jpg"],
-            "created_at": now - timedelta(days=n % 90),
-            "resolved_at": now - timedelta(days=1) if (n % 3 == 2) else None
+            "resolved_at": now - timedelta(days=1) if is_resolved else None,
+            "created_at": report_created,
+            "created_by": report_reporter_id,
+            "updated_at": report_updated,
+            "updated_by": 1 if is_resolved else report_reporter_id
         })
     db.reports.insert_many(reports, ordered=False)
     

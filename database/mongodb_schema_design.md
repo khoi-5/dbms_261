@@ -296,3 +296,56 @@ Trong MongoDB (NoSQL Document Store), chúng ta áp dụng mô hình **Data Mode
   "resolved_at": "2026-10-28T17:00:00Z"
 }
 ```
+
+---
+
+## 4. Sơ Đồ Kiến Trúc MongoDB (Mermaid Flowchart Diagram)
+
+```mermaid
+flowchart TD
+    %% Định nghĩa bảng màu trực quan giống hình ảnh thiết kế
+    classDef shippingStyle fill:#FFF8E7,stroke:#D97706,stroke-width:2px,color:#92400E;
+    classDef accountStyle fill:#F3E8FF,stroke:#9333EA,stroke-width:2px,color:#6B21A8;
+    classDef categoryStyle fill:#E6F4EA,stroke:#0D9488,stroke-width:2px,color:#115E59;
+    classDef orderStyle fill:#EFF6FF,stroke:#3B82F6,stroke-width:2px,color:#1E40AF;
+    classDef reportStyle fill:#FEE2E2,stroke:#EF4444,stroke-width:2px,color:#991B1B;
+    classDef productStyle fill:#FFF7ED,stroke:#F97316,stroke-width:2px,color:#C2410C;
+    classDef evalStyle fill:#F1F5F9,stroke:#64748B,stroke-width:2px,color:#334155;
+    classDef promoStyle fill:#FCE7F3,stroke:#EC4899,stroke-width:2px,color:#9D174D;
+    classDef cartStyle fill:#E0F2FE,stroke:#0EA5E9,stroke-width:2px,color:#0369A1;
+
+    %% 1. Tầng trên cùng (Top Row)
+    shipping_providers["<b>shipping_providers</b><br/>──────────────<br/>• _id (PK)<br/>• provider_name<br/>• contact_info"]:::shippingStyle
+    accounts["<b>accounts</b><br/>──────────────<br/>• _id (PK)<br/>• username, email, roles<br/>• profiles, addresses"]:::accountStyle
+    categories["<b>categories</b><br/>──────────────<br/>• _id (PK)<br/>• category_name<br/>• parent_category_id"]:::categoryStyle
+
+    %% 2. Tầng ở giữa (Middle Row)
+    orders["<b>orders</b><br/>──────────────<br/>• _id (PK)<br/>• buyer_id<br/>• shop_orders, payment"]:::orderStyle
+    reports["<b>reports</b><br/>──────────────<br/>• _id (PK)<br/>• reporter_id, reported_id<br/>• admin_id, reason, status<br/>• evidence_images"]:::reportStyle
+    products["<b>products</b><br/>──────────────<br/>• _id (PK)<br/>• seller_id, category_id<br/>• product_name, product_type<br/>• attributes, variants"]:::productStyle
+
+    %% 3. Tầng dưới cùng (Bottom Row)
+    evaluations["<b>evaluations</b><br/>──────────────<br/>• _id (PK)<br/>• buyer_id, product_id, variant_id<br/>• rating, comment, images"]:::evalStyle
+    promotions["<b>promotions</b><br/>──────────────<br/>• _id (PK)<br/>• seller_id, discount_config<br/>• type, min_bill<br/>• applicable_variant_ids"]:::promoStyle
+    carts["<b>carts</b><br/>──────────────<br/>• _id (PK)<br/>• buyer_id<br/>• items"]:::cartStyle
+
+    %% Mối liên kết từ shipping_providers
+    shipping_providers -->|shipping_provider_id| orders
+
+    %% Mối liên kết từ accounts
+    accounts -->|buyer_id| orders
+    accounts -.->|seller_id| orders
+    accounts -->|reporter_id| reports
+    accounts -->|seller_id| products
+    accounts -->|buyer_id| evaluations
+    accounts -->|buyer_id| carts
+
+    %% Mối liên kết từ categories
+    categories -.->|parent_category_id| categories
+    categories -->|category_id| products
+
+    %% Mối liên kết từ products
+    products -.->|product_id, variant_id| evaluations
+    products -.->|eligible IDs| promotions
+    products -.->|product_id, variant_id| carts
+```

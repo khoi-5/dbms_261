@@ -71,60 +71,59 @@ GO
 PRINT N'[2/8] Sinh Tài khoản Quản trị, Vận chuyển & Danh mục...';
 
 -- Tạo Admin (Account_ID = 1)
-INSERT INTO Account (Username, password, FName, LName, Phone, Account_Status, Email, Gender, avatar, Address, CCCD, Date_Of_Birth)
-VALUES ('admin_root', '$2a$10$hashed_admin_pwd', N'Văn', N'Quản Trị', '0901000000', N'ACTIVE', 'admin@bkpee.vn', N'Nam', 'https://bkpee.vn/img/admin.png', N'Quận 10, TP.HCM', '079090000000', '1995-05-15');
+INSERT INTO Account (Username, password, FName, LName, Phone, Account_Status, Email, Gender, avatar, Address, CCCD, Date_Of_Birth, Created_At, Created_By, Updated_At, Updated_By)
+VALUES ('admin_root', '$2a$10$hashed_admin_pwd', N'Văn', N'Quản Trị', '0901000000', N'ACTIVE', 'admin@bkpee.vn', N'Nam', 'https://bkpee.vn/img/admin.png', N'Quận 10, TP.HCM', '079090000000', '1995-05-15', GETDATE(), 1, GETDATE(), 1);
 
 INSERT INTO Admin (Account_ID, Admin_Role) VALUES (1, N'SUPER_ADMIN');
 
 -- 10 Đơn vị vận chuyển
-INSERT INTO Shipping_Provider (Provider_Name, Phone, Address, Admin_ID, Base_Shipping_Fee)
+INSERT INTO Shipping_Provider (Provider_Name, Phone, Address, Admin_ID, Base_Shipping_Fee, Created_At, Created_By, Updated_At, Updated_By)
 VALUES
-(N'Giao Hàng Tiết Kiệm (GHTK)', '19006092', N'Tòa nhà VTV, Cầu Giấy, Hà Nội', 1, 22000),
-(N'Giao Hàng Nhanh (GHN)', '1900636677', N'Tân Bình, TP.HCM', 1, 25000),
-(N'Viettel Post', '19008095', N'Ba Đình, Hà Nội', 1, 20000),
-(N'VNPost (Bưu Điện Việt Nam)', '1900545481', N'Hoàn Kiếm, Hà Nội', 1, 18000),
-(N'J&T Express', '19001088', N'Bình Thạnh, TP.HCM', 1, 23000),
-(N'Ninja Van', '1900886877', N'Quận 7, TP.HCM', 1, 24000),
-(N'BEST Express', '19001031', N'Bình Tân, TP.HCM', 1, 21000),
-(N'Shopee Xpress (SPX)', '19001221', N'Thủ Đức, TP.HCM', 1, 19000),
-(N'GrabExpress Siêu Tốc', '19001555', N'Quận 1, TP.HCM', 1, 35000),
-(N'Ahamove Giao Trong Ngày', '1900545411', N'Quận 3, TP.HCM', 1, 30000);
+(N'Giao Hàng Tiết Kiệm (GHTK)',     '19006092',   N'Tòa nhà VTV, Cầu Giấy, Hà Nội', 1, 22000, GETDATE(), 1, GETDATE(), 1),
+(N'Giao Hàng Nhanh (GHN)',             '1900636677', N'Tân Bình, TP.HCM',                 1, 25000, GETDATE(), 1, GETDATE(), 1),
+(N'Viettel Post',                       '19008095',   N'Ba Đình, Hà Nội',                 1, 20000, GETDATE(), 1, GETDATE(), 1),
+(N'VNPost (Bưu Điện Việt Nam)',          '1900545481', N'Hoàn Kiếm, Hà Nội',              1, 18000, GETDATE(), 1, GETDATE(), 1),
+(N'J&T Express',                        '19001088',   N'Bình Thạnh, TP.HCM',               1, 23000, GETDATE(), 1, GETDATE(), 1),
+(N'Ninja Van',                          '1900886877', N'Quận 7, TP.HCM',                   1, 24000, GETDATE(), 1, GETDATE(), 1),
+(N'BEST Express',                       '19001031',   N'Bình Tân, TP.HCM',                 1, 21000, GETDATE(), 1, GETDATE(), 1),
+(N'Shopee Xpress (SPX)',                '19001221',   N'Thủ Đức, TP.HCM',                1, 19000, GETDATE(), 1, GETDATE(), 1),
+(N'GrabExpress Siêu Tốc',              '19001555',   N'Quận 1, TP.HCM',                   1, 35000, GETDATE(), 1, GETDATE(), 1),
+(N'Ahamove Giao Trong Ngày',            '1900545411', N'Quận 3, TP.HCM',                   1, 30000, GETDATE(), 1, GETDATE(), 1);
 
--- 10 Danh mục cha (Category 1 -> 10)
-INSERT INTO Category (Category_Name, Parent_Category_ID, Admin_ID) VALUES
-(N'Sách & Văn Phòng Phẩm', NULL, 1),
-(N'Thời Trang & May Mặc', NULL, 1),
-(N'Thiết Bị Điện Tử', NULL, 1),
-(N'Nhà Cửa & Đời Sống', NULL, 1),
-(N'Mẹ & Bé', NULL, 1),
-(N'Sức Khỏe & Sắc Đẹp', NULL, 1),
-(N'Thể Thao & Du Lịch', NULL, 1),
-(N'Ô Tô - Xe Máy', NULL, 1),
-(N'Bách Hóa Online', NULL, 1),
-(N'Đồ Chơi & Quà Tặng', NULL, 1);
+INSERT INTO Category (Category_Name, Parent_Category_ID, Admin_ID, Created_At, Created_By, Updated_At, Updated_By) VALUES
+(N'Sách & Văn Phòng Phẩm', NULL, 1, GETDATE(), 1, GETDATE(), 1),
+(N'Thời Trang & May Mặc', NULL, 1, GETDATE(), 1, GETDATE(), 1),
+(N'Thiết Bị Điện Tử', NULL, 1, GETDATE(), 1, GETDATE(), 1),
+(N'Nhà Cửa & Đời Sống', NULL, 1, GETDATE(), 1, GETDATE(), 1),
+(N'Mẹ & Bé', NULL, 1, GETDATE(), 1, GETDATE(), 1),
+(N'Sức Khỏe & Sắc Đẹp', NULL, 1, GETDATE(), 1, GETDATE(), 1),
+(N'Thể Thao & Du Lịch', NULL, 1, GETDATE(), 1, GETDATE(), 1),
+(N'Ô Tô - Xe Máy', NULL, 1, GETDATE(), 1, GETDATE(), 1),
+(N'Bách Hóa Online', NULL, 1, GETDATE(), 1, GETDATE(), 1),
+(N'Đồ Chơi & Quà Tặng', NULL, 1, GETDATE(), 1, GETDATE(), 1);
 
 -- 20 Danh mục con (Category 11 -> 30)
-INSERT INTO Category (Category_Name, Parent_Category_ID, Admin_ID) VALUES
-(N'Sách Công Nghệ & Kỹ Thuật', 1, 1),
-(N'Sách Kinh Tế & Khởi Nghiệp', 1, 1),
-(N'Truyện Tranh & Manga', 1, 1),
-(N'Áo Thun Nam Nữ', 2, 1),
-(N'Quần Jeans & Kaki', 2, 1),
-(N'Giày Dép Thời Trang', 2, 1),
-(N'Tai Nghe & Loa Bluetooth', 3, 1),
-(N'Điện Thoại Thông Minh', 3, 1),
-(N'Laptop & Máy Tính Bảng', 3, 1),
-(N'Nội Thất Phòng Khách', 4, 1),
-(N'Đồ Gia Dụng Nhà Bếp', 4, 1),
-(N'Sữa & Thực Phẩm Cho Bé', 5, 1),
-(N'Tã Bỉm Trẻ Em', 5, 1),
-(N'Chăm Sóc Da Mặt', 6, 1),
-(N'Thực Phẩm Chức Năng', 6, 1),
-(N'Dụng Cụ Tập Gym', 7, 1),
-(N'Lều Trại & Phụ Kiện Phượt', 7, 1),
-(N'Mũ Bảo Hiểm Chính Hãng', 8, 1),
-(N'Đồ Ăn Vặt & Bánh Kẹo', 9, 1),
-(N'Mô Hình Lắp Ráp Anime', 10, 1);
+INSERT INTO Category (Category_Name, Parent_Category_ID, Admin_ID, Created_At, Created_By, Updated_At, Updated_By) VALUES
+(N'Sách Công Nghệ & Kỹ Thuật',  1, 1, GETDATE(), 1, GETDATE(), 1),
+(N'Sách Kinh Tế & Khởi Nghiệp', 1, 1, GETDATE(), 1, GETDATE(), 1),
+(N'Truyện Tranh & Manga',        1, 1, GETDATE(), 1, GETDATE(), 1),
+(N'Áo Thun Nam Nữ',              2, 1, GETDATE(), 1, GETDATE(), 1),
+(N'Quần Jeans & Kaki',            2, 1, GETDATE(), 1, GETDATE(), 1),
+(N'Giày Dép Thời Trang',           2, 1, GETDATE(), 1, GETDATE(), 1),
+(N'Tai Nghe & Loa Bluetooth',     3, 1, GETDATE(), 1, GETDATE(), 1),
+(N'Điện Thoại Thông Minh',        3, 1, GETDATE(), 1, GETDATE(), 1),
+(N'Laptop & Máy Tính Bảng',      3, 1, GETDATE(), 1, GETDATE(), 1),
+(N'Nội Thất Phòng Khách',         4, 1, GETDATE(), 1, GETDATE(), 1),
+(N'Đồ Gia Dụng Nhà Bếp',          4, 1, GETDATE(), 1, GETDATE(), 1),
+(N'Sữa & Thực Phẩm Cho Bé',     5, 1, GETDATE(), 1, GETDATE(), 1),
+(N'Tã Bỉm Trẻ Em',                5, 1, GETDATE(), 1, GETDATE(), 1),
+(N'Chăm Sóc Da Mặt',              6, 1, GETDATE(), 1, GETDATE(), 1),
+(N'Thực Phẩm Chức Năng',         6, 1, GETDATE(), 1, GETDATE(), 1),
+(N'Dụng Cụ Tập Gym',              7, 1, GETDATE(), 1, GETDATE(), 1),
+(N'Lều Trại & Phụ Kiện Phượt', 7, 1, GETDATE(), 1, GETDATE(), 1),
+(N'Mũ Bảo Hiểm Chính Hãng',      8, 1, GETDATE(), 1, GETDATE(), 1),
+(N'Đồ Ăn Vặt & Bánh Kẹo',         9, 1, GETDATE(), 1, GETDATE(), 1),
+(N'Mô Hình Lắp Ráp Anime',         10, 1, GETDATE(), 1, GETDATE(), 1);
 GO
 
 -- ------------------------------------------------------------------------------
@@ -138,7 +137,7 @@ Numbers AS (
     FROM Digits d1 CROSS JOIN Digits d2 CROSS JOIN Digits d3 CROSS JOIN Digits d4
     WHERE d1.d + d2.d*10 + d3.d*100 + d4.d*1000 BETWEEN 1 AND 2000
 )
-INSERT INTO Account (Username, password, FName, LName, Phone, Account_Status, Email, Gender, avatar, Address, CCCD, Date_Of_Birth)
+INSERT INTO Account (Username, password, FName, LName, Phone, Account_Status, Email, Gender, avatar, Address, CCCD, Date_Of_Birth, Created_At, Created_By, Updated_At, Updated_By)
 SELECT 
     CASE WHEN n <= 200 THEN 'seller_' + RIGHT('0000' + CAST(n AS VARCHAR(10)), 4)
          ELSE 'buyer_' + RIGHT('0000' + CAST(n AS VARCHAR(10)), 4) END AS Username,
@@ -161,7 +160,11 @@ SELECT
     'https://bkpee.vn/avatar/user_' + CAST(n AS VARCHAR(10)) + '.png',
     N'Số ' + CAST((n * 7 % 300 + 1) AS NVARCHAR(10)) + N' Đường ' + CAST((n % 50 + 1) AS NVARCHAR(10)) + N', TP. Hồ Chí Minh',
     '0791' + RIGHT('00000000' + CAST(n AS VARCHAR(10)), 8) AS CCCD,
-    DATEADD(DAY, -(n * 13 % 10000 + 6000), '2026-01-01')
+    DATEADD(DAY, -(n * 13 % 10000 + 6000), '2026-01-01'),
+    DATEADD(DAY, -(n % 365), GETDATE()),  -- Created_At
+    1,                                    -- Created_By (Admin)
+    DATEADD(DAY, -(n % 365), GETDATE()),  -- Updated_At
+    1                                     -- Updated_By (Admin)
 FROM Numbers;
 
 -- User (Tất cả 2000 tài khoản từ ID 2 đến 2001)
@@ -207,8 +210,8 @@ JOIN Account a ON b.Account_ID = a.Account_ID
 WHERE b.Account_ID % 2 = 0;
 
 -- Giỏ hàng cho mỗi Buyer
-INSERT INTO Cart (Total_product, Buyer_ID)
-SELECT 0, Account_ID
+INSERT INTO Cart (Total_product, Buyer_ID, Created_At, Created_By, Updated_At, Updated_By)
+SELECT 0, Account_ID, GETDATE(), Account_ID, GETDATE(), Account_ID
 FROM Buyer;
 GO
 
@@ -223,10 +226,10 @@ Numbers AS (
     FROM Digits d1 CROSS JOIN Digits d2 CROSS JOIN Digits d3 CROSS JOIN Digits d4
     WHERE d1.d + d2.d*10 + d3.d*100 + d4.d*1000 BETWEEN 1 AND 3000
 )
-INSERT INTO Product (Seller_ID, Category_ID, Product_Name, Description, Manufacturer)
+INSERT INTO Product (Seller_ID, Category_ID, Product_Name, Description, Manufacturer, Created_At, Created_By, Updated_At, Updated_By)
 SELECT 
-    2 + (n % 200) AS Seller_ID,                                              -- Phân bố đều qua 200 Sellers
-    11 + (n % 20) AS Category_ID,                                            -- Danh mục con từ 11 đến 30
+    2 + (n % 200) AS Seller_ID,
+    11 + (n % 20) AS Category_ID,
     CASE (n % 3)
         WHEN 0 THEN N'Sách Chuyên Khảo ' + CAST(n AS NVARCHAR(10)) + N': ' + 
                     CASE (n % 4) WHEN 0 THEN N'Hệ Quản Trị CSDL' WHEN 1 THEN N'Trí Tuệ Nhân Tạo' WHEN 2 THEN N'Lập Trình Web' ELSE N'Khai Phá Dữ Liệu' END
@@ -242,7 +245,11 @@ SELECT
         WHEN 2 THEN N'Sony Corporation'
         WHEN 3 THEN N'NXB Đại Học Quốc Gia'
         ELSE N'Coolmate Vietnam'
-    END AS Manufacturer
+    END AS Manufacturer,
+    DATEADD(DAY, -(n % 300), GETDATE()),  -- Created_At
+    2 + (n % 200),                        -- Created_By (Seller_ID)
+    DATEADD(DAY, -(n % 300), GETDATE()),  -- Updated_At
+    2 + (n % 200)                         -- Updated_By (Seller_ID)
 FROM Numbers;
 
 -- 1.000 Sách (Product_ID chia hết cho 3)
@@ -304,14 +311,18 @@ Numbers AS (
     FROM Digits d1 CROSS JOIN Digits d2 CROSS JOIN Digits d3
     WHERE d1.d + d2.d*10 + d3.d*100 BETWEEN 1 AND 500
 )
-INSERT INTO Promotion (Quantity, Start_Date, Expiration_Date, Min_Bill, Type, Seller_ID)
+INSERT INTO Promotion (Quantity, Start_Date, Expiration_Date, Min_Bill, Type, Seller_ID, Created_At, Created_By, Updated_At, Updated_By)
 SELECT 
     100 + (n * 5 % 500),
     '2026-01-01 00:00:00',
     '2026-12-31 23:59:59',
     100000 + (n % 10) * 50000,
     CASE (n % 2) WHEN 0 THEN 'COUPON' ELSE 'VOUCHER' END,
-    2 + (n % 200) -- Seller_ID
+    2 + (n % 200),         -- Seller_ID
+    GETDATE(),             -- Created_At
+    2 + (n % 200),         -- Created_By (Seller_ID)
+    GETDATE(),             -- Updated_At
+    2 + (n % 200)          -- Updated_By (Seller_ID)
 FROM Numbers;
 
 -- 250 Coupons
@@ -350,12 +361,16 @@ Numbers AS (
     FROM Digits d1 CROSS JOIN Digits d2 CROSS JOIN Digits d3 CROSS JOIN Digits d4 CROSS JOIN Digits d5
     WHERE d1.d + d2.d*10 + d3.d*100 + d4.d*1000 + d5.d*10000 BETWEEN 1 AND 10000
 )
-INSERT INTO [Order] (Order_Time, Total_Price, Delivery_Address, Buyer_ID)
+INSERT INTO [Order] (Order_Time, Total_Price, Delivery_Address, Buyer_ID, Created_At, Created_By, Updated_At, Updated_By)
 SELECT 
     DATEADD(MINUTE, -(n * 23 % 400000), '2026-10-30 00:00:00') AS Order_Time,
     200000 + (n * 37 % 500) * 10000 AS Total_Price,
     N'Địa chỉ giao hàng số ' + CAST(n AS NVARCHAR(10)) + N', Phường ' + CAST((n % 20 + 1) AS NVARCHAR(5)) + N', TP. Hồ Chí Minh',
-    202 + (n % 1800) -- Phân bố đều qua 1.800 Buyers
+    202 + (n % 1800) AS Buyer_ID,
+    DATEADD(MINUTE, -(n * 23 % 400000), '2026-10-30 00:00:00'),  -- Created_At = Order_Time
+    202 + (n % 1800),                                             -- Created_By (Buyer_ID)
+    DATEADD(MINUTE, -(n * 23 % 400000), '2026-10-30 00:00:00'),  -- Updated_At = Order_Time
+    202 + (n % 1800)                                              -- Updated_By (Buyer_ID)
 FROM Numbers;
 GO
 
@@ -438,7 +453,7 @@ Numbers AS (
     FROM Digits d1 CROSS JOIN Digits d2 CROSS JOIN Digits d3 CROSS JOIN Digits d4
     WHERE d1.d + d2.d*10 + d3.d*100 + d4.d*1000 BETWEEN 1 AND 6000
 )
-INSERT INTO Evaluation (Buyer_ID, Variant_ID, Rating, Content, Create_Time)
+INSERT INTO Evaluation (Buyer_ID, Variant_ID, Rating, Content, Created_At, Created_By, Updated_At, Updated_By)
 SELECT 
     202 + (n % 1800) AS Buyer_ID,
     1 + (n * 7 % 8500) AS Variant_ID,
@@ -448,7 +463,10 @@ SELECT
         WHEN 1 THEN N'Chất lượng tốt so với giá tiền, shop phục vụ nhiệt tình và chu đáo.'
         ELSE N'Dùng rất ưng ý, sẽ ủng hộ shop tiếp vào lần sau ạ!'
     END,
-    DATEADD(DAY, -(n % 180), '2026-10-30 00:00:00')
+    DATEADD(DAY, -(n % 180), '2026-10-30 00:00:00'),   -- Created_At
+    202 + (n % 1800),                                   -- Created_By (Buyer_ID)
+    DATEADD(DAY, -(n % 180), '2026-10-30 00:00:00'),   -- Updated_At
+    202 + (n % 1800)                                    -- Updated_By (Buyer_ID)
 FROM Numbers;
 
 -- Ảnh đánh giá (Evaluation_Image cho 50% bài đánh giá = 3.000 ảnh)
@@ -464,7 +482,7 @@ Numbers AS (
     FROM Digits d1 CROSS JOIN Digits d2 CROSS JOIN Digits d3 CROSS JOIN Digits d4
     WHERE d1.d + d2.d*10 + d3.d*100 + d4.d*1000 BETWEEN 1 AND 1000
 )
-INSERT INTO Report (Reporter_ID, Reported_ID, Admin_ID, Reason, Description, Status, Created_At, Resolved_At)
+INSERT INTO Report (Reporter_ID, Reported_ID, Admin_ID, Reason, Description, Status, Resolved_At, Created_At, Created_By, Updated_At, Updated_By)
 SELECT 
     202 + (n % 1800) AS Reporter_ID,
     2 + (n % 200) AS Reported_ID,
@@ -481,8 +499,16 @@ SELECT
         WHEN 1 THEN N'IN_PROGRESS'
         ELSE N'RESOLVED'
     END AS Status,
-    DATEADD(DAY, -(n % 90), '2026-10-30 00:00:00'),
-    CASE WHEN (n % 3 = 2) THEN '2026-10-30 05:00:00' ELSE NULL END
+    CASE WHEN (n % 3 = 2) THEN '2026-10-30 05:00:00' ELSE NULL END AS Resolved_At,
+    DATEADD(DAY, -(n % 90), '2026-10-30 00:00:00')  AS Created_At,
+    202 + (n % 1800)                                 AS Created_By,
+    CASE WHEN (n % 3 = 2)
+         THEN CAST('2026-10-30 05:00:00' AS DATETIME2)
+         ELSE DATEADD(DAY, -(n % 90), '2026-10-30 00:00:00')
+    END                                              AS Updated_At,
+    CASE WHEN (n % 3 = 2) THEN 1
+         ELSE 202 + (n % 1800)
+    END                                              AS Updated_By
 FROM Numbers;
 
 -- 1.000 Ảnh khiếu nại
