@@ -2,15 +2,25 @@
  * BackendNewApplication — điểm khởi động ứng dụng.
  *
  * Chức năng
- * Khi triển khai, bổ sung class main và cấu hình khởi động Spring Boot theo phiên bản Java, Spring và
- * công cụ build đã chọn. Package com.bkpee là đề xuất; phạm vi quét thành phần cần bao phủ các package
- * con.
+ * Khởi động Spring Boot với Java 21 và Maven. Package com.bkpee là gốc quét thành phần,
+ * bao phủ các package con.
  *
  * Phân chia trách nhiệm
  * File khởi tạo ứng dụng, không chứa nghiệp vụ mua bán, mật khẩu hoặc thao tác tự đặt lại database. Dữ
- * liệu mẫu được quản lý riêng theo môi trường thử nghiệm. Bộ khung hiện chưa có cấu hình build để chạy
- * ứng dụng.
+ * liệu mẫu được quản lý riêng theo môi trường thử nghiệm. Cấu hình build nằm trong backend/pom.xml.
  *
  * Trạng thái hiện tại
- * File chỉ chứa mô tả thiết kế, chưa có code thực thi.
+ * Đã có main khởi động; các chức năng nghiệp vụ vẫn theo tài liệu thiết kế hiện có.
  */
+package com.bkpee;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class BackendNewApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(BackendNewApplication.class, args);
+    }
+}

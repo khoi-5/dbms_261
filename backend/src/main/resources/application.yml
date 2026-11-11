@@ -1,15 +1,37 @@
-# Cấu hình ứng dụng dự kiến
-# File hiện chỉ chứa ghi chú, chưa có cấu hình chạy thực tế.
-#
-# Khi triển khai, thống nhất cổng chạy và các thông tin kết nối database.
-# Thông tin nhạy cảm được cung cấp qua biến môi trường hoặc cơ chế cấu hình phù hợp.
-# Không sao chép mật khẩu sa vào source; tài khoản ứng dụng cần quyền phù hợp.
-#
-# Xác định database phát triển trước khi chạy migration hoặc nạp dữ liệu mẫu.
-# Nếu schema được quản lý bằng migration, JPA có thể kiểm tra mapping với schema
-# thay vì tự tạo, sửa hoặc xóa bảng khi ứng dụng khởi động.
-#
-# Cấu hình múi giờ, địa chỉ frontend, log và cơ chế xác thực theo môi trường.
-# Backend Node.js cũ sử dụng cổng 5000; nếu chạy đồng thời cần chọn cổng khác
-# cho ứng dụng mới và thống nhất địa chỉ API với frontend.
-# Cấu hình token, cổng thanh toán hoặc MongoDB chỉ bổ sung khi nhóm chọn sử dụng.
+
+server:
+  port: ${SERVER_PORT:8080}
+
+spring:
+  application:
+    name: mini-ecommerce
+
+  # Java properties syntax, not shell dotenv. Run Maven from backend/.
+  # OS environment variables override values imported from this file.
+  config:
+    import: "optional:file:./.env[.properties]"
+
+  datasource:
+    url: ${DB_URL}
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+
+    # Leave empty for Windows Authentication; set both for SQL Authentication.
+    username: ${DB_USERNAME:}
+    password: ${DB_PASSWORD:}
+
+  sql:
+    init:
+      mode: never
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    show-sql: false
+
+app:
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173,http://127.0.0.1:5173}
+  jwt:
+    secret: ${JWT_SECRET}
+    expiration-minutes: ${JWT_EXPIRATION_MINUTES:120}

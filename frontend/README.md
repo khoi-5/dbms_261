@@ -1,16 +1,47 @@
-# React + Vite
+# BKPEE frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React + Vite + JavaScript. Run from `E:\dbms\frontend`:
 
-Currently, two official plugins are available:
+```powershell
+npm ci
+npm run dev
+```
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Open http://localhost:5173/products. Vite pins localhost:5173 with `strictPort`:
+if another process owns that port, it reports an error instead of silently
+moving to 5174 and breaking the expected CORS origin.
 
-## React Compiler
+Backend: from `E:\dbms\backend`, run `mvn spring-boot:run` for
+http://localhost:8080. SQL Server remains localhost:1433, database BKPEE_DB.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+The ignored frontend `.env` and tracked `.env.example` use:
 
-## Expanding the ESLint configuration
+```dotenv
+VITE_API_URL=http://localhost:8080/api
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+On a new checkout, copy `.env.example` to `.env` if needed; the API client also
+defaults to this URL. `VITE_*` values are public, never credentials. Restart Vite
+after changing `.env`. A process-level `VITE_API_URL` overrides the file: remove
+an old override with `Remove-Item Env:VITE_API_URL -ErrorAction SilentlyContinue`
+in the terminal before starting Vite. Backend `SERVER_PORT` similarly defaults
+to 8080 and may be overridden by process environment or CLI arguments.
+
+If products show `Failed to fetch`, confirm the backend is running on 8080,
+the served API module uses that URL, and CORS permits http://localhost:5173.
+A backend running only on another port cannot answer requests sent to 8080.
+An expired token normally causes HTTP 401, not a network `Failed to fetch`.
+Guest requests without a stored token have no Authorization header.
+
+Checks that do not write SQL data:
+
+```powershell
+node --test src/services/api.test.js
+npm run build
+cd ..\backend
+python scripts/check_connection.py
+```
+
+See [implementation and demo notes](../IMPLEMENTATION_F01_F08_F09_F10.md).
+The smoke/demo scripts and opt-in SQL integration tests create QA records;
+do not run those as a read-only connection diagnostic.

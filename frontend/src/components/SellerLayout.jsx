@@ -1,7 +1,10 @@
 import React from 'react';
-import { NavLink, Outlet } from 'react-router-dom';
+import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { useAuth } from '../auth/AuthContext';
 
 export default function SellerLayout() {
+  const { logout } = useAuth();
+  const navigate = useNavigate();
   const sidebarStyle = {
     width: '260px',
     backgroundColor: '#ffffff',
@@ -47,7 +50,7 @@ export default function SellerLayout() {
 
         <div style={{ borderTop: '1px solid #e5e7eb', paddingTop: '16px' }}>
           <button 
-            onClick={() => alert('Đăng xuất thành công (F01)')}
+            onClick={() => { logout(); navigate('/login'); }}
             style={{ width: '100%', textAlign: 'left', padding: '10px 16px', backgroundColor: 'transparent', border: 'none', color: '#ef4444', fontSize: '14px', cursor: 'pointer', borderRadius: '8px' }}
           >
             Đăng xuất
