@@ -1,3 +1,12 @@
+-- SAFE TEST-ONLY SEED. Original benchmark is preserved in 03_seed_large.backup.sql.
+-- Connect explicitly to a NEW database named BKPEE_TEST_<suffix>, NEVER BKPEE_DB.
+-- One batch + one transaction: the guard cannot be bypassed by continuing after GO.
+IF DB_NAME() NOT LIKE N'BKPEE[_]TEST[_]%'
+    THROW 51000, 'Refusing seed: target must have BKPEE_TEST_ prefix; website database is forbidden.', 1;
+SET XACT_ABORT ON;
+DECLARE @SeedTime DATETIME2 = '2026-10-30T00:00:00';
+BEGIN TRY
+BEGIN TRANSACTION;
 -- ==============================================================================
 -- BTL HỆ QUẢN TRỊ CSDL (DBMS) - HỆ THỐNG TMĐT BKPEE
 -- File: 03_seed_large.sql
@@ -8,12 +17,10 @@
 --   3. Minh chứng các thao tác nghiệp vụ nâng cao (Multi-table JOINs, Subqueries)
 -- ==============================================================================
 
-USE BKPEE_DB;
-GO
 
 SET NOCOUNT ON;
 PRINT N'==============================================================';
-PRINT N'BẮT ĐẦU SINH DỮ LIỆU LỚN CHO BKPEE_DB...';
+PRINT N'BẮT ĐẦU SINH DỮ LIỆU TRÊN DATABASE TEST: ' + DB_NAME();
 PRINT N'==============================================================';
 
 -- ------------------------------------------------------------------------------
@@ -63,7 +70,6 @@ JOIN sys.schemas s ON t.schema_id = s.schema_id
 JOIN sys.identity_columns c ON t.object_id = c.object_id;
 
 EXEC sp_executesql @reseedSql;
-GO
 
 -- ------------------------------------------------------------------------------
 -- 2. Sinh Quản trị viên, Vận chuyển & Danh mục
@@ -72,59 +78,58 @@ PRINT N'[2/8] Sinh Tài khoản Quản trị, Vận chuyển & Danh mục...';
 
 -- Tạo Admin (Account_ID = 1)
 INSERT INTO Account (Username, password, FName, LName, Phone, Account_Status, Email, Gender, avatar, Address, CCCD, Date_Of_Birth, Created_At, Created_By, Updated_At, Updated_By)
-VALUES ('admin_root', '$2a$10$hashed_admin_pwd', N'Văn', N'Quản Trị', '0901000000', N'ACTIVE', 'admin@bkpee.vn', N'Nam', 'https://bkpee.vn/img/admin.png', N'Quận 10, TP.HCM', '079090000000', '1995-05-15', GETDATE(), 1, GETDATE(), 1);
+VALUES ('admin_root', '$2a$10$hashed_admin_pwd', N'Văn', N'Quản Trị', '0901000000', N'ACTIVE', 'admin@bkpee.vn', N'Nam', 'https://bkpee.vn/img/admin.png', N'Quận 10, TP.HCM', '079090000000', '1995-05-15', @SeedTime, 1, @SeedTime, 1);
 
 INSERT INTO Admin (Account_ID, Admin_Role) VALUES (1, N'SUPER_ADMIN');
 
 -- 10 Đơn vị vận chuyển
 INSERT INTO Shipping_Provider (Provider_Name, Phone, Address, Admin_ID, Base_Shipping_Fee, Created_At, Created_By, Updated_At, Updated_By)
 VALUES
-(N'Giao Hàng Tiết Kiệm (GHTK)',     '19006092',   N'Tòa nhà VTV, Cầu Giấy, Hà Nội', 1, 22000, GETDATE(), 1, GETDATE(), 1),
-(N'Giao Hàng Nhanh (GHN)',             '1900636677', N'Tân Bình, TP.HCM',                 1, 25000, GETDATE(), 1, GETDATE(), 1),
-(N'Viettel Post',                       '19008095',   N'Ba Đình, Hà Nội',                 1, 20000, GETDATE(), 1, GETDATE(), 1),
-(N'VNPost (Bưu Điện Việt Nam)',          '1900545481', N'Hoàn Kiếm, Hà Nội',              1, 18000, GETDATE(), 1, GETDATE(), 1),
-(N'J&T Express',                        '19001088',   N'Bình Thạnh, TP.HCM',               1, 23000, GETDATE(), 1, GETDATE(), 1),
-(N'Ninja Van',                          '1900886877', N'Quận 7, TP.HCM',                   1, 24000, GETDATE(), 1, GETDATE(), 1),
-(N'BEST Express',                       '19001031',   N'Bình Tân, TP.HCM',                 1, 21000, GETDATE(), 1, GETDATE(), 1),
-(N'Shopee Xpress (SPX)',                '19001221',   N'Thủ Đức, TP.HCM',                1, 19000, GETDATE(), 1, GETDATE(), 1),
-(N'GrabExpress Siêu Tốc',              '19001555',   N'Quận 1, TP.HCM',                   1, 35000, GETDATE(), 1, GETDATE(), 1),
-(N'Ahamove Giao Trong Ngày',            '1900545411', N'Quận 3, TP.HCM',                   1, 30000, GETDATE(), 1, GETDATE(), 1);
+(N'Giao Hàng Tiết Kiệm (GHTK)',     '19006092',   N'Tòa nhà VTV, Cầu Giấy, Hà Nội', 1, 22000, @SeedTime, 1, @SeedTime, 1),
+(N'Giao Hàng Nhanh (GHN)',             '1900636677', N'Tân Bình, TP.HCM',                 1, 25000, @SeedTime, 1, @SeedTime, 1),
+(N'Viettel Post',                       '19008095',   N'Ba Đình, Hà Nội',                 1, 20000, @SeedTime, 1, @SeedTime, 1),
+(N'VNPost (Bưu Điện Việt Nam)',          '1900545481', N'Hoàn Kiếm, Hà Nội',              1, 18000, @SeedTime, 1, @SeedTime, 1),
+(N'J&T Express',                        '19001088',   N'Bình Thạnh, TP.HCM',               1, 23000, @SeedTime, 1, @SeedTime, 1),
+(N'Ninja Van',                          '1900886877', N'Quận 7, TP.HCM',                   1, 24000, @SeedTime, 1, @SeedTime, 1),
+(N'BEST Express',                       '19001031',   N'Bình Tân, TP.HCM',                 1, 21000, @SeedTime, 1, @SeedTime, 1),
+(N'Shopee Xpress (SPX)',                '19001221',   N'Thủ Đức, TP.HCM',                1, 19000, @SeedTime, 1, @SeedTime, 1),
+(N'GrabExpress Siêu Tốc',              '19001555',   N'Quận 1, TP.HCM',                   1, 35000, @SeedTime, 1, @SeedTime, 1),
+(N'Ahamove Giao Trong Ngày',            '1900545411', N'Quận 3, TP.HCM',                   1, 30000, @SeedTime, 1, @SeedTime, 1);
 
 INSERT INTO Category (Category_Name, Parent_Category_ID, Admin_ID, Created_At, Created_By, Updated_At, Updated_By) VALUES
-(N'Sách & Văn Phòng Phẩm', NULL, 1, GETDATE(), 1, GETDATE(), 1),
-(N'Thời Trang & May Mặc', NULL, 1, GETDATE(), 1, GETDATE(), 1),
-(N'Thiết Bị Điện Tử', NULL, 1, GETDATE(), 1, GETDATE(), 1),
-(N'Nhà Cửa & Đời Sống', NULL, 1, GETDATE(), 1, GETDATE(), 1),
-(N'Mẹ & Bé', NULL, 1, GETDATE(), 1, GETDATE(), 1),
-(N'Sức Khỏe & Sắc Đẹp', NULL, 1, GETDATE(), 1, GETDATE(), 1),
-(N'Thể Thao & Du Lịch', NULL, 1, GETDATE(), 1, GETDATE(), 1),
-(N'Ô Tô - Xe Máy', NULL, 1, GETDATE(), 1, GETDATE(), 1),
-(N'Bách Hóa Online', NULL, 1, GETDATE(), 1, GETDATE(), 1),
-(N'Đồ Chơi & Quà Tặng', NULL, 1, GETDATE(), 1, GETDATE(), 1);
+(N'Sách & Văn Phòng Phẩm', NULL, 1, @SeedTime, 1, @SeedTime, 1),
+(N'Thời Trang & May Mặc', NULL, 1, @SeedTime, 1, @SeedTime, 1),
+(N'Thiết Bị Điện Tử', NULL, 1, @SeedTime, 1, @SeedTime, 1),
+(N'Nhà Cửa & Đời Sống', NULL, 1, @SeedTime, 1, @SeedTime, 1),
+(N'Mẹ & Bé', NULL, 1, @SeedTime, 1, @SeedTime, 1),
+(N'Sức Khỏe & Sắc Đẹp', NULL, 1, @SeedTime, 1, @SeedTime, 1),
+(N'Thể Thao & Du Lịch', NULL, 1, @SeedTime, 1, @SeedTime, 1),
+(N'Ô Tô - Xe Máy', NULL, 1, @SeedTime, 1, @SeedTime, 1),
+(N'Bách Hóa Online', NULL, 1, @SeedTime, 1, @SeedTime, 1),
+(N'Đồ Chơi & Quà Tặng', NULL, 1, @SeedTime, 1, @SeedTime, 1);
 
 -- 20 Danh mục con (Category 11 -> 30)
 INSERT INTO Category (Category_Name, Parent_Category_ID, Admin_ID, Created_At, Created_By, Updated_At, Updated_By) VALUES
-(N'Sách Công Nghệ & Kỹ Thuật',  1, 1, GETDATE(), 1, GETDATE(), 1),
-(N'Sách Kinh Tế & Khởi Nghiệp', 1, 1, GETDATE(), 1, GETDATE(), 1),
-(N'Truyện Tranh & Manga',        1, 1, GETDATE(), 1, GETDATE(), 1),
-(N'Áo Thun Nam Nữ',              2, 1, GETDATE(), 1, GETDATE(), 1),
-(N'Quần Jeans & Kaki',            2, 1, GETDATE(), 1, GETDATE(), 1),
-(N'Giày Dép Thời Trang',           2, 1, GETDATE(), 1, GETDATE(), 1),
-(N'Tai Nghe & Loa Bluetooth',     3, 1, GETDATE(), 1, GETDATE(), 1),
-(N'Điện Thoại Thông Minh',        3, 1, GETDATE(), 1, GETDATE(), 1),
-(N'Laptop & Máy Tính Bảng',      3, 1, GETDATE(), 1, GETDATE(), 1),
-(N'Nội Thất Phòng Khách',         4, 1, GETDATE(), 1, GETDATE(), 1),
-(N'Đồ Gia Dụng Nhà Bếp',          4, 1, GETDATE(), 1, GETDATE(), 1),
-(N'Sữa & Thực Phẩm Cho Bé',     5, 1, GETDATE(), 1, GETDATE(), 1),
-(N'Tã Bỉm Trẻ Em',                5, 1, GETDATE(), 1, GETDATE(), 1),
-(N'Chăm Sóc Da Mặt',              6, 1, GETDATE(), 1, GETDATE(), 1),
-(N'Thực Phẩm Chức Năng',         6, 1, GETDATE(), 1, GETDATE(), 1),
-(N'Dụng Cụ Tập Gym',              7, 1, GETDATE(), 1, GETDATE(), 1),
-(N'Lều Trại & Phụ Kiện Phượt', 7, 1, GETDATE(), 1, GETDATE(), 1),
-(N'Mũ Bảo Hiểm Chính Hãng',      8, 1, GETDATE(), 1, GETDATE(), 1),
-(N'Đồ Ăn Vặt & Bánh Kẹo',         9, 1, GETDATE(), 1, GETDATE(), 1),
-(N'Mô Hình Lắp Ráp Anime',         10, 1, GETDATE(), 1, GETDATE(), 1);
-GO
+(N'Sách Công Nghệ & Kỹ Thuật',  1, 1, @SeedTime, 1, @SeedTime, 1),
+(N'Sách Kinh Tế & Khởi Nghiệp', 1, 1, @SeedTime, 1, @SeedTime, 1),
+(N'Truyện Tranh & Manga',        1, 1, @SeedTime, 1, @SeedTime, 1),
+(N'Áo Thun Nam Nữ',              2, 1, @SeedTime, 1, @SeedTime, 1),
+(N'Quần Jeans & Kaki',            2, 1, @SeedTime, 1, @SeedTime, 1),
+(N'Giày Dép Thời Trang',           2, 1, @SeedTime, 1, @SeedTime, 1),
+(N'Tai Nghe & Loa Bluetooth',     3, 1, @SeedTime, 1, @SeedTime, 1),
+(N'Điện Thoại Thông Minh',        3, 1, @SeedTime, 1, @SeedTime, 1),
+(N'Laptop & Máy Tính Bảng',      3, 1, @SeedTime, 1, @SeedTime, 1),
+(N'Nội Thất Phòng Khách',         4, 1, @SeedTime, 1, @SeedTime, 1),
+(N'Đồ Gia Dụng Nhà Bếp',          4, 1, @SeedTime, 1, @SeedTime, 1),
+(N'Sữa & Thực Phẩm Cho Bé',     5, 1, @SeedTime, 1, @SeedTime, 1),
+(N'Tã Bỉm Trẻ Em',                5, 1, @SeedTime, 1, @SeedTime, 1),
+(N'Chăm Sóc Da Mặt',              6, 1, @SeedTime, 1, @SeedTime, 1),
+(N'Thực Phẩm Chức Năng',         6, 1, @SeedTime, 1, @SeedTime, 1),
+(N'Dụng Cụ Tập Gym',              7, 1, @SeedTime, 1, @SeedTime, 1),
+(N'Lều Trại & Phụ Kiện Phượt', 7, 1, @SeedTime, 1, @SeedTime, 1),
+(N'Mũ Bảo Hiểm Chính Hãng',      8, 1, @SeedTime, 1, @SeedTime, 1),
+(N'Đồ Ăn Vặt & Bánh Kẹo',         9, 1, @SeedTime, 1, @SeedTime, 1),
+(N'Mô Hình Lắp Ráp Anime',         10, 1, @SeedTime, 1, @SeedTime, 1);
 
 -- ------------------------------------------------------------------------------
 -- 3. Sinh 2.000 Tài khoản: 200 Sellers và 1.800 Buyers
@@ -161,11 +166,11 @@ SELECT
     N'Số ' + CAST((n * 7 % 300 + 1) AS NVARCHAR(10)) + N' Đường ' + CAST((n % 50 + 1) AS NVARCHAR(10)) + N', TP. Hồ Chí Minh',
     '0791' + RIGHT('00000000' + CAST(n AS VARCHAR(10)), 8) AS CCCD,
     DATEADD(DAY, -(n * 13 % 10000 + 6000), '2026-01-01'),
-    DATEADD(DAY, -(n % 365), GETDATE()),  -- Created_At
+    DATEADD(DAY, -(n % 365), @SeedTime),  -- Created_At
     1,                                    -- Created_By (Admin)
-    DATEADD(DAY, -(n % 365), GETDATE()),  -- Updated_At
+    DATEADD(DAY, -(n % 365), @SeedTime),  -- Updated_At
     1                                     -- Updated_By (Admin)
-FROM Numbers;
+FROM Numbers ORDER BY n;
 
 -- User (Tất cả 2000 tài khoản từ ID 2 đến 2001)
 INSERT INTO [User] (Account_ID, Trust_Score)
@@ -211,83 +216,61 @@ WHERE b.Account_ID % 2 = 0;
 
 -- Giỏ hàng cho mỗi Buyer
 INSERT INTO Cart (Total_product, Buyer_ID, Created_At, Created_By, Updated_At, Updated_By)
-SELECT 0, Account_ID, GETDATE(), Account_ID, GETDATE(), Account_ID
-FROM Buyer;
-GO
+SELECT 0, b.Account_ID, @SeedTime, b.Account_ID, @SeedTime, b.Account_ID
+FROM Buyer b ORDER BY b.Account_ID;
 
 -- ------------------------------------------------------------------------------
 -- 4. Sinh 3.000 Sản phẩm (Product) & Phân loại Bảng con
 -- ------------------------------------------------------------------------------
 PRINT N'[4/8] Sinh 3.000 Sản phẩm (Sách, Quần áo, Điện tử)...';
 
+-- A shared staging map is the source of truth for names, categories and subtypes.
+-- Product_ID is an IDENTITY, not the seed ordinal or a classification rule.
+CREATE TABLE #SeedProducts (
+    Seed_ID INT PRIMARY KEY, Family VARCHAR(20) NOT NULL, Category_ID INT NOT NULL,
+    Product_Name NVARCHAR(255) NOT NULL, Manufacturer NVARCHAR(100) NOT NULL
+);
 WITH Digits AS (SELECT 0 AS d UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9),
 Numbers AS (
-    SELECT d1.d + d2.d*10 + d3.d*100 + d4.d*1000 AS n
+    SELECT d1.d+d2.d*10+d3.d*100+d4.d*1000 AS n
     FROM Digits d1 CROSS JOIN Digits d2 CROSS JOIN Digits d3 CROSS JOIN Digits d4
-    WHERE d1.d + d2.d*10 + d3.d*100 + d4.d*1000 BETWEEN 1 AND 3000
+    WHERE d1.d+d2.d*10+d3.d*100+d4.d*1000 BETWEEN 1 AND 3000
 )
-INSERT INTO Product (Seller_ID, Category_ID, Product_Name, Description, Manufacturer, Created_At, Created_By, Updated_At, Updated_By)
-SELECT 
-    2 + (n % 200) AS Seller_ID,
-    11 + (n % 20) AS Category_ID,
-    CASE (n % 3)
-        WHEN 0 THEN N'Sách Chuyên Khảo ' + CAST(n AS NVARCHAR(10)) + N': ' + 
-                    CASE (n % 4) WHEN 0 THEN N'Hệ Quản Trị CSDL' WHEN 1 THEN N'Trí Tuệ Nhân Tạo' WHEN 2 THEN N'Lập Trình Web' ELSE N'Khai Phá Dữ Liệu' END
-        WHEN 1 THEN N'Thời Trang Cao Cấp ' + CAST(n AS NVARCHAR(10)) + N': ' + 
-                    CASE (n % 4) WHEN 0 THEN N'Áo Thun Nam Nữ Cổ Tròn' WHEN 1 THEN N'Quần Tây Công Sở' WHEN 2 THEN N'Áo Khoác Gió Kháng Nước' ELSE N'Váy Công Chúa Đi Tiệc' END
-        ELSE N'Thiết Bị Công Nghệ ' + CAST(n AS NVARCHAR(10)) + N': ' + 
-                    CASE (n % 4) WHEN 0 THEN N'Tai Nghe Chống Ồn' WHEN 1 THEN N'Điện Thoại Flagship' WHEN 2 THEN N'Bàn Phím Cơ Không Dây' ELSE N'Chuột Gaming RGB' END
-    END AS Product_Name,
-    N'Mô tả chi tiết sản phẩm mã số ' + CAST(n AS NVARCHAR(10)) + N'. Hàng chính hãng 100%, bảo hành uy tín, miễn phí vận chuyển toàn quốc.',
-    CASE (n % 5)
-        WHEN 0 THEN N'Tập Đoàn Vingroup'
-        WHEN 1 THEN N'Samsung Electronics'
-        WHEN 2 THEN N'Sony Corporation'
-        WHEN 3 THEN N'NXB Đại Học Quốc Gia'
-        ELSE N'Coolmate Vietnam'
-    END AS Manufacturer,
-    DATEADD(DAY, -(n % 300), GETDATE()),  -- Created_At
-    2 + (n % 200),                        -- Created_By (Seller_ID)
-    DATEADD(DAY, -(n % 300), GETDATE()),  -- Updated_At
-    2 + (n % 200)                         -- Updated_By (Seller_ID)
-FROM Numbers;
-
--- 1.000 Sách (Product_ID chia hết cho 3)
-INSERT INTO Books (Product_ID, Publisher)
-SELECT Product_ID, N'NXB Đại Học Quốc Gia - Chi nhánh ' + CAST((Product_ID % 5 + 1) AS NVARCHAR(5))
-FROM Product
-WHERE Product_ID % 3 = 0;
-
--- Tác giả sách (Book_Author)
-INSERT INTO Book_Author (Product_ID, Author_Name)
-SELECT Product_ID, N'GS.TS. Tác Giả Chính ' + CAST((Product_ID % 50 + 1) AS NVARCHAR(10))
-FROM Books;
-
-INSERT INTO Book_Author (Product_ID, Author_Name)
-SELECT Product_ID, N'ThS. Đồng Tác Giả ' + CAST((Product_ID % 30 + 1) AS NVARCHAR(10))
-FROM Books
-WHERE Product_ID % 2 = 0;
-
--- 1.000 Thời trang (Product_ID % 3 = 1)
-INSERT INTO Clothes (Product_ID, Material)
-SELECT Product_ID, 
-    CASE (Product_ID % 3)
-        WHEN 0 THEN N'100% Cotton Hữu Cơ'
-        WHEN 1 THEN N'Vải Đũi Tự Nhiên Thoáng Mát'
-        ELSE N'Polyester Siêu Nhẹ Tản Nhiệt'
-    END
-FROM Product
-WHERE Product_ID % 3 = 1;
-
--- 1.000 Điện tử (Product_ID % 3 = 2)
-INSERT INTO Electronics (Product_ID, Warranty_ID, Warranty_Time)
-SELECT Product_ID, 
-    'WARRANTY-VN-' + RIGHT('000000' + CAST(Product_ID AS VARCHAR(10)), 6),
-    CAST((Product_ID % 3 + 1) * 12 AS NVARCHAR(10)) + N' tháng'
-FROM Product
-WHERE Product_ID % 3 = 2;
-GO
-
+INSERT INTO #SeedProducts (Seed_ID,Family,Category_ID,Product_Name,Manufacturer)
+SELECT n, CASE n%3 WHEN 0 THEN 'Books' WHEN 1 THEN 'Clothes' ELSE 'Electronics' END,
+    CASE n%3 WHEN 0 THEN 11+(n/3)%3 WHEN 1 THEN 14+(n/3)%3 ELSE 17+(n/3)%3 END,
+    CASE n%3
+      WHEN 0 THEN CASE (n/3)%3
+        WHEN 0 THEN CASE (n/9)%4 WHEN 0 THEN N'Sách Hệ quản trị cơ sở dữ liệu' WHEN 1 THEN N'Sách Lập trình Java' WHEN 2 THEN N'Sách Trí tuệ nhân tạo' ELSE N'Sách Phân tích dữ liệu' END
+        WHEN 1 THEN CASE (n/9)%3 WHEN 0 THEN N'Sách Quản trị doanh nghiệp' WHEN 1 THEN N'Sách Khởi nghiệp thực hành' ELSE N'Sách Kinh tế học căn bản' END
+        ELSE N'Truyện tranh Hành trình khám phá' END
+      WHEN 1 THEN CASE (n/3)%3 WHEN 0 THEN N'Áo thun cotton cổ tròn' WHEN 1 THEN N'Quần jeans dáng thẳng' ELSE N'Giày thể thao thoáng khí' END
+      ELSE CASE (n/3)%3 WHEN 0 THEN N'Tai nghe Bluetooth chống ồn' WHEN 1 THEN N'Điện thoại thông minh' ELSE N'Laptop học tập và làm việc' END
+    END + N' - Mẫu ' + CAST(n AS NVARCHAR(10)),
+    CASE n%3 WHEN 0 THEN N'NXB Tri Thức'
+      WHEN 1 THEN CASE (n/3)%3 WHEN 2 THEN N'Biti''s' ELSE N'Coolmate' END
+      ELSE CASE (n/3)%3 WHEN 0 THEN N'Sony' WHEN 1 THEN N'Samsung' ELSE N'Lenovo' END END
+FROM Numbers ORDER BY n;
+INSERT INTO Product (Seller_ID,Category_ID,Product_Name,Description,Manufacturer,Created_At,Created_By,Updated_At,Updated_By)
+SELECT 2+(Seed_ID%200),Category_ID,Product_Name,
+       N'Sản phẩm ' + Family + N', thông tin và thuộc tính theo đúng danh mục.',Manufacturer,
+       DATEADD(DAY,-(Seed_ID%300),@SeedTime),2+(Seed_ID%200),
+       DATEADD(DAY,-(Seed_ID%300),@SeedTime),2+(Seed_ID%200)
+FROM #SeedProducts ORDER BY Seed_ID;
+-- Resolve real generated IDs through the unique staged name, never ID modulo.
+INSERT INTO Books (Product_ID,Publisher)
+SELECT p.Product_ID,sp.Manufacturer FROM Product p JOIN #SeedProducts sp ON sp.Product_Name=p.Product_Name WHERE sp.Family='Books';
+INSERT INTO Book_Author (Product_ID,Author_Name)
+SELECT Product_ID,N'Tác giả ' + CAST(Product_ID%50+1 AS NVARCHAR(10)) FROM Books;
+INSERT INTO Book_Author (Product_ID,Author_Name)
+SELECT Product_ID,N'Đồng tác giả ' + CAST(Product_ID%30+1 AS NVARCHAR(10)) FROM Books WHERE Product_ID%2=0;
+INSERT INTO Clothes (Product_ID,Material)
+SELECT p.Product_ID,CASE sp.Category_ID WHEN 14 THEN N'100% Cotton' WHEN 15 THEN N'Denim' ELSE N'Vải lưới và cao su' END
+FROM Product p JOIN #SeedProducts sp ON sp.Product_Name=p.Product_Name WHERE sp.Family='Clothes';
+INSERT INTO Electronics (Product_ID,Warranty_ID,Warranty_Time)
+SELECT p.Product_ID,'WARRANTY-VN-'+RIGHT('000000'+CAST(p.Product_ID AS VARCHAR(10)),6),
+       CASE sp.Category_ID WHEN 17 THEN N'12 tháng' WHEN 18 THEN N'24 tháng' ELSE N'36 tháng' END
+FROM Product p JOIN #SeedProducts sp ON sp.Product_Name=p.Product_Name WHERE sp.Family='Electronics';
 -- ------------------------------------------------------------------------------
 -- 5. Sinh 9.000 Biến thể sản phẩm (Product_Variant) & Khuyến mãi (Promotion)
 -- ------------------------------------------------------------------------------
@@ -297,12 +280,16 @@ PRINT N'[5/8] Sinh 9.000 Biến thể Sản phẩm & Khuyến mãi...';
 INSERT INTO Product_Variant (Product_ID, Price, Is_Active, Quantity_Stock, Image)
 SELECT 
     p.Product_ID,
-    (50000 + (p.Product_ID * 17 % 200) * 10000) * v.multiplier AS Price,
+    (CASE sp.Family WHEN 'Books' THEN 50000+(sp.Seed_ID%40)*5000
+        WHEN 'Clothes' THEN 150000+(sp.Seed_ID%40)*25000
+        ELSE CASE sp.Category_ID WHEN 17 THEN 500000+(sp.Seed_ID%20)*100000
+             WHEN 18 THEN 3000000+(sp.Seed_ID%20)*500000 ELSE 8000000+(sp.Seed_ID%20)*500000 END END) * v.multiplier AS Price,
     1 AS Is_Active,
     50 + (p.Product_ID * 7 % 450) AS Quantity_Stock,
     'https://bkpee.vn/img/product/variant_' + CAST(p.Product_ID AS VARCHAR(10)) + '_' + CAST(v.multiplier AS VARCHAR(5)) + '.png' AS Image
 FROM Product p
-CROSS JOIN (SELECT 1 AS multiplier UNION ALL SELECT 2 UNION ALL SELECT 3) v;
+JOIN #SeedProducts sp ON sp.Product_Name=p.Product_Name
+CROSS JOIN (SELECT 1 AS multiplier UNION ALL SELECT 2 UNION ALL SELECT 3) v ORDER BY sp.Seed_ID,v.multiplier;
 
 -- Sinh 500 Chương trình khuyến mãi từ 200 Sellers
 WITH Digits AS (SELECT 0 AS d UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9),
@@ -319,11 +306,11 @@ SELECT
     100000 + (n % 10) * 50000,
     CASE (n % 2) WHEN 0 THEN 'COUPON' ELSE 'VOUCHER' END,
     2 + (n % 200),         -- Seller_ID
-    GETDATE(),             -- Created_At
+    @SeedTime,             -- Created_At
     2 + (n % 200),         -- Created_By (Seller_ID)
-    GETDATE(),             -- Updated_At
+    @SeedTime,             -- Updated_At
     2 + (n % 200)          -- Updated_By (Seller_ID)
-FROM Numbers;
+FROM Numbers ORDER BY n;
 
 -- 250 Coupons
 INSERT INTO Coupon (Promotion_ID, percent_discount, max_discount)
@@ -348,7 +335,6 @@ SELECT DISTINCT
     (p.Promotion_ID * 17 % 8500 + 1) AS Variant_ID,
     p.Promotion_ID
 FROM Promotion p;
-GO
 
 -- ------------------------------------------------------------------------------
 -- 6. Sinh 10.000 Đơn hàng tổng ([Order])
@@ -371,8 +357,7 @@ SELECT
     202 + (n % 1800),                                             -- Created_By (Buyer_ID)
     DATEADD(MINUTE, -(n * 23 % 400000), '2026-10-30 00:00:00'),  -- Updated_At = Order_Time
     202 + (n % 1800)                                              -- Updated_By (Buyer_ID)
-FROM Numbers;
-GO
+FROM Numbers ORDER BY n;
 
 -- ------------------------------------------------------------------------------
 -- 7. Sinh 15.000 Đơn hàng con theo Shop (Shop_Order) & 35.000 Món hàng (Shop_Order_Item)
@@ -397,7 +382,7 @@ SELECT
     CASE WHEN (o.Order_ID % 6 >= 4) THEN DATEADD(DAY, 2, o.Order_Time) ELSE NULL END AS Delivered_At
 FROM [Order] o
 CROSS JOIN (SELECT 0 AS shop_offset UNION ALL SELECT 1) s
-WHERE (s.shop_offset = 0) OR (o.Order_ID % 2 = 0);
+WHERE (s.shop_offset = 0) OR (o.Order_ID % 2 = 0) ORDER BY o.Order_ID,s.shop_offset;
 
 -- Chi tiết món hàng (~35.000 Shop_Order_Items)
 INSERT INTO Shop_Order_Item (Shop_Order_ID, Variant_ID, Quantity, Purchase_Price)
@@ -439,7 +424,6 @@ UPDATE c
 SET c.Total_product = sub.total_q
 FROM Cart c
 JOIN (SELECT Cart_ID, SUM(Quantity) AS total_q FROM Cart_Item GROUP BY Cart_ID) sub ON c.Cart_ID = sub.Cart_ID;
-GO
 
 -- ------------------------------------------------------------------------------
 -- 8. Sinh 6.000 Đánh giá (Evaluation) & 1.000 Khiếu nại (Report)
@@ -467,7 +451,7 @@ SELECT
     202 + (n % 1800),                                   -- Created_By (Buyer_ID)
     DATEADD(DAY, -(n % 180), '2026-10-30 00:00:00'),   -- Updated_At
     202 + (n % 1800)                                    -- Updated_By (Buyer_ID)
-FROM Numbers;
+FROM Numbers ORDER BY n;
 
 -- Ảnh đánh giá (Evaluation_Image cho 50% bài đánh giá = 3.000 ảnh)
 INSERT INTO Evaluation_Image (Evaluate_ID, Image)
@@ -509,16 +493,15 @@ SELECT
     CASE WHEN (n % 3 = 2) THEN 1
          ELSE 202 + (n % 1800)
     END                                              AS Updated_By
-FROM Numbers;
+FROM Numbers ORDER BY n;
 
 -- 1.000 Ảnh khiếu nại
 INSERT INTO Report_Image (Report_ID, Image)
 SELECT Report_ID, 'https://bkpee.vn/img/report/evidence_' + CAST(Report_ID AS VARCHAR(10)) + '.jpg'
 FROM Report;
-GO
 
 PRINT N'==============================================================';
-PRINT N'HOÀN TẤT SINH DỮ LIỆU LỚN THÀNH CÔNG!';
+-- Success is printed only after assertions and COMMIT below.
 PRINT N'==============================================================';
 
 -- Thống kê số lượng bản ghi của toàn bộ 28 bảng
@@ -529,4 +512,30 @@ FROM sys.tables t
 INNER JOIN sys.partitions p ON t.object_id = p.object_id
 WHERE p.index_id IN (0, 1)
 ORDER BY TotalRows DESC, t.name;
-GO
+
+-- Deterministic dataset invariants. No new persistent schema or indexes.
+IF (SELECT COUNT(*) FROM Product)<>3000 OR (SELECT COUNT(*) FROM Product_Variant)<>9000
+    THROW 51001, 'Unexpected product/variant count', 1;
+IF (SELECT COUNT(*) FROM Books)<>1000 OR (SELECT COUNT(*) FROM Clothes)<>1000 OR (SELECT COUNT(*) FROM Electronics)<>1000
+    THROW 51002, 'Unexpected subtype count', 1;
+IF EXISTS(SELECT 1 FROM Product p JOIN #SeedProducts sp ON sp.Product_Name=p.Product_Name
+    JOIN Category c ON c.Category_ID=p.Category_ID
+    WHERE p.Category_ID<>sp.Category_ID OR COALESCE(c.Parent_Category_ID,c.Category_ID)<>
+        CASE sp.Family WHEN 'Books' THEN 1 WHEN 'Clothes' THEN 2 ELSE 3 END)
+    THROW 51003, 'Subtype/category mismatch', 1;
+IF (SELECT COUNT(*) FROM Product p JOIN #SeedProducts sp ON sp.Product_Name=p.Product_Name)<>3000
+    THROW 51004, 'Staging mapping is incomplete', 1;
+IF (SELECT COUNT(*) FROM Account)<>2001 OR (SELECT COUNT(*) FROM Category)<>30
+    OR (SELECT COUNT(*) FROM [Order])<>10000 OR (SELECT COUNT(*) FROM Shop_Order)<>15000
+    OR (SELECT COUNT(*) FROM Shop_Order_Item)<>35000 OR (SELECT COUNT(*) FROM Cart_Item)<>3000
+    THROW 51005, 'Unexpected benchmark table count', 1;
+IF EXISTS(SELECT 1 FROM Cart c OUTER APPLY(SELECT COALESCE(SUM(Quantity),0) units FROM Cart_Item i WHERE i.Cart_ID=c.Cart_ID) x WHERE c.Total_product<>x.units)
+    THROW 51006, 'Cart.Total_product must equal SUM Quantity', 1;
+DROP TABLE #SeedProducts;
+COMMIT;
+PRINT N'SEED VALIDATED AND COMMITTED ON TEST DATABASE ONLY';
+END TRY
+BEGIN CATCH
+    IF @@TRANCOUNT>0 ROLLBACK;
+    THROW;
+END CATCH;

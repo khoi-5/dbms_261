@@ -13,6 +13,8 @@ import uuid
 from decimal import Decimal
 
 BASE = os.environ.get('API_BASE', 'http://localhost:8080/api')
+if not os.environ.get('TEST_DATABASE', '').startswith('BKPEE_TEST_'):
+    raise SystemExit('Write smoke test requires TEST_DATABASE=BKPEE_TEST_<suffix> and an API serving that isolated database.')
 checks = 0
 
 

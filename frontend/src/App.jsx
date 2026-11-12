@@ -8,6 +8,7 @@ import AuthPage from './pages/AuthPage';
 import ProductsPage from './pages/ProductsPage';
 import CartPage from './pages/CartPage';
 import PlaceholderPage from './pages/PlaceholderPage';
+import ProfilePage from './pages/ProfilePage';
 import './App.css';
 export default function App() {
   return <BrowserRouter><AuthProvider><Routes>
@@ -21,7 +22,7 @@ export default function App() {
         <Route path="checkout" element={<PlaceholderPage title="Thanh toán (F11)" />} />
         <Route path="orders" element={<PlaceholderPage title="Lịch sử mua hàng (F12)" />} />
         <Route path="spending" element={<PlaceholderPage title="Thống kê chi tiêu (F13)" />} />
-        <Route path="profile" element={<PlaceholderPage title="Hồ sơ cá nhân" />} />
+        <Route path="profile" element={<ProfilePage />} />
       </Route>
     </Route>
     <Route element={<ProtectedRoute role="SELLER" />}>

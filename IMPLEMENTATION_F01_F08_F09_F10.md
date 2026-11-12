@@ -1,5 +1,9 @@
 # Bàn giao F01, F08, F09, F10
 
+> Nâng cấp mới nhất: xem `UPGRADE_F01_F08_F09_F10.md`. Catalog có cấu hình phân
+> trang tập trung; `/profile` đã triển khai và `Cart.Total_product = SUM(Quantity)`.
+> Các test ghi SQL hiện bắt buộc dùng database riêng có tiền tố `BKPEE_TEST_`.
+
 ## Chuẩn hóa cổng — kiểm tra lại ngày 12/11/2026
 
 - Frontend `http://localhost:5173`, backend `http://localhost:8080`, SQL Server
@@ -162,8 +166,9 @@ ORDER BY Product_ID OFFSET/FETCH cho trang; không trả toàn bộ 3.000 Produc
 - Xóa: `DELETE FROM Cart_Item WHERE Cart_ID=? AND Variant_ID=?`.
 - Tổng tiền SQL từng dòng: `CAST(v.Price*ci.Quantity AS decimal(28,2))`; cộng BigDecimal
   ở backend. Không dùng số tiền client.
-- `Cart.Total_product` được quy ước là số dòng variant (COUNT), `totalQuantity` là
-  tổng số đơn vị. Giỏ không giữ kho; F11 phải kiểm tra và trừ kho trong transaction.
+- `Cart.Total_product` và `totalQuantity` là tổng số đơn vị `SUM(Quantity)`.
+  Chỉ cập nhật khi sửa giỏ, không backfill hoặc ghi từ GET. Giỏ không giữ kho;
+  F11 phải kiểm tra và trừ kho trong transaction.
 - Variant ngừng bán/hết kho trong giỏ vẫn được hiển thị cảnh báo và có thể xóa;
   thao tác tăng/đặt số lượng phải qua kiểm tra trạng thái/kho.
 
@@ -249,17 +254,14 @@ không chạy để kiểm tra cổng/kết nối. Chạy lại smoke:
 
 ```powershell
 cd E:\dbms\backend
-$env:API_BASE='http://localhost:8080/api'
-python scripts/smoke_buyer.py
-$env:RUN_SQL_INTEGRATION='true'
-mvn test -q
-Remove-Item Env:RUN_SQL_INTEGRATION
+python scripts/prepare_upgrade_test_db.py BKPEE_TEST_demo_unique
+python -u scripts/run_upgrade_checks.py BKPEE_TEST_demo_unique
 ```
 
 ## Route và phần phụ thuộc nhóm
 
 - Công khai: `/` redirect `/products`, `/products`, `/login`, `/register`.
-- Buyer: `/cart`; placeholder `/checkout`, `/orders`, `/spending`, `/profile`.
+- Buyer: `/cart`, `/profile`; placeholder `/checkout`, `/orders`, `/spending`.
 - Seller: giữ `/seller/products`, `/seller/dashboard`, `/seller/orders`,
   `/seller/promotions`; bọc kiểm tra role. Logout Seller đã nối AuthContext.
 - Logic Seller F02–F04 không bị viết lại; các fetch/mock/hardcoded ID và endpoint
@@ -267,5 +269,7 @@ Remove-Item Env:RUN_SQL_INTEGRATION
 - Nhóm Seller cần nối API của họ với API client và danh tính JWT, cung cấp ảnh thật.
   Buyer có placeholder ảnh khi seed URL thiếu/hỏng; không thay ảnh bằng sản phẩm mock.
 - F11 cần kiểm tra lại giá/kho, trạng thái Seller, voucher và xử lý transaction.
-- F05–F07/F12–F13 và hồ sơ vẫn để thành viên khác làm.
+- F05–F07/F12–F13 vẫn để thành viên khác làm; hồ sơ Buyer xem báo cáo nâng cấp mới.
 - Cần kiểm tra UI thủ công trên desktop/mobile và đối chiếu hai ảnh trước nghiệm thu.
+  Script tạo DB test sẽ từ chối tên đã tồn tại; chọn suffix mới. Không chạy trực tiếp
+  `03_seed_large.backup.sql` vì bản gốc còn chứa `USE BKPEE_DB`.

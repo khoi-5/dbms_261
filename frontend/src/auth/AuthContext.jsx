@@ -29,6 +29,7 @@ export function AuthProvider({ children }) {
     tokenStore.set(session.token); setUser(session.account); setError('');
     return session.account;
   };
-  return <AuthContext.Provider value={{ user, loading, error, logout, authenticate }}>{children}</AuthContext.Provider>;
+  const refreshUser = async () => { const account = await api('/accounts/me'); setUser(account); return account; };
+  return <AuthContext.Provider value={{ user, loading, error, logout, authenticate, refreshUser }}>{children}</AuthContext.Provider>;
 }
 export const useAuth = () => useContext(AuthContext);

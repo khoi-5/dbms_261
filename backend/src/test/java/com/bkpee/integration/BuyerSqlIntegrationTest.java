@@ -26,6 +26,10 @@ class BuyerSqlIntegrationTest {
     @Autowired JwtService tokens;
     @Autowired JwtEncoder encoder;
     @Autowired JdbcTemplate db;
+    @org.junit.jupiter.api.BeforeEach void refuseWebsiteDatabase() {
+        assertTrue(db.queryForObject("SELECT DB_NAME()",String.class).startsWith("BKPEE_TEST_"),
+            "SQL write tests require a separate BKPEE_TEST_ database");
+    }
     private int status(String path,String token) throws Exception {
         var builder=HttpRequest.newBuilder(URI.create("http://localhost:"+port+"/api"+path)).GET();
         if(token!=null) builder.header("Authorization","Bearer "+token);

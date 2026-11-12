@@ -660,3 +660,18 @@ p {
     padding:25px;
   }
 }
+.search-input { padding-left:16px; min-width:0; }
+.search-input button { display:flex; align-items:center; justify-content:center; flex:0 0 30px; }
+.password-input { display:flex; position:relative; align-items:center; }
+.password-input input { width:100%; padding-right:46px; }
+.password-input button { position:absolute; right:5px; display:flex; align-items:center; justify-content:center; padding:8px; background:none; }
+.profile-grid { display:grid; grid-template-columns:1fr 1fr; gap:24px; align-items:start; }
+.profile-card { background:white; padding:26px; border-radius:12px; min-width:0; }
+.profile-card h2 { margin-bottom:12px; }
+.profile-card form, .profile-card fieldset { display:flex; flex-direction:column; gap:16px; margin-top:20px; }
+.profile-card fieldset { border:0; margin:0; min-width:0; }
+.purchase-quantity { display:flex; gap:8px; margin:10px 0; align-items:center; }
+.purchase-quantity input { width:86px; text-align:center; }
+.purchase-total { display:flex; justify-content:space-between; margin-top:20px; }
+.catalog-price-note { margin:-4px 0 16px; }
+@media(max-width:780px) { .profile-grid { grid-template-columns:1fr; } .search-row { gap:8px; } .search-input input { width:0; } }

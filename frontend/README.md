@@ -36,12 +36,14 @@ Guest requests without a stored token have no Authorization header.
 Checks that do not write SQL data:
 
 ```powershell
-node --test src/services/api.test.js
+node --test src/services/api.test.js src/config/catalog.test.js
 npm run build
 cd ..\backend
 python scripts/check_connection.py
 ```
 
 See [implementation and demo notes](../IMPLEMENTATION_F01_F08_F09_F10.md).
+See [controlled upgrade report](../UPGRADE_F01_F08_F09_F10.md) for configurable
+pagination, quantity selection, profile/password contracts and isolated SQL tests.
 The smoke/demo scripts and opt-in SQL integration tests create QA records;
 do not run those as a read-only connection diagnostic.

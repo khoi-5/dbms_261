@@ -1,0 +1,2 @@
+# Preserve the original seed backup byte-for-byte, including its line endings.
+database/03_seed_large.backup.sql -text

@@ -3,6 +3,7 @@ package com.bkpee.auth;
 import java.util.Map;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.ConcurrencyFailureException;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.http.ResponseEntity;
@@ -22,4 +23,6 @@ public class ApiErrors {
     ResponseEntity<?> malformed() { return ResponseEntity.badRequest().body(Map.of("message","Kiểu dữ liệu yêu cầu không hợp lệ")); }
     @ExceptionHandler(DataAccessException.class)
     ResponseEntity<?> database() { return ResponseEntity.status(503).body(Map.of("message","Dịch vụ dữ liệu tạm thời không khả dụng. Vui lòng thử lại.")); }
+    @ExceptionHandler(ConcurrencyFailureException.class)
+    ResponseEntity<?> concurrent() { return ResponseEntity.status(409).body(Map.of("message","Dữ liệu đang được cập nhật đồng thời. Hãy tải lại trước khi thử tiếp.")); }
 }
