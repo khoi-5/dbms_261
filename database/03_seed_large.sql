@@ -177,11 +177,14 @@ FROM Account
 WHERE Account_ID >= 2;
 
 -- 200 Sellers (Account_ID từ 2 đến 201)
-INSERT INTO Seller (Account_ID, Shop_Name, Bank_Account_Number)
+INSERT INTO Seller (Account_ID, Shop_Name, Bank_Name, Bank_Account_Holder, Bank_Account_Number, Bank_Branch)
 SELECT 
     Account_ID,
     N'Gian Hàng Official Shop ' + CAST(Account_ID - 1 AS NVARCHAR(10)),
-    '9704' + RIGHT('000000000000' + CAST(Account_ID AS VARCHAR(20)), 12)
+    N'Vietcombank',
+    N'CHU TK GIAN HANG ' + RIGHT('0000' + CAST(Account_ID AS VARCHAR(10)), 4),
+    '9704' + RIGHT('000000000000' + CAST(Account_ID AS VARCHAR(20)), 12),
+    N'TP. Ho Chi Minh'
 FROM Account
 WHERE Account_ID BETWEEN 2 AND 201;
 

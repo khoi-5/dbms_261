@@ -119,7 +119,10 @@ GO
 CREATE TABLE Seller (
     Account_ID INT PRIMARY KEY,
     Shop_Name NVARCHAR(100) NOT NULL UNIQUE,
+    Bank_Name NVARCHAR(100) NOT NULL,
+    Bank_Account_Holder NVARCHAR(100) NOT NULL,
     Bank_Account_Number VARCHAR(50) NOT NULL,
+    Bank_Branch NVARCHAR(100) NULL,
     CONSTRAINT FK_Seller_User FOREIGN KEY (Account_ID) REFERENCES [User](Account_ID) ON DELETE CASCADE
 );
 GO

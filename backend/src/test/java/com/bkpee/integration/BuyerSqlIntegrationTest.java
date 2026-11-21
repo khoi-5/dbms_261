@@ -58,7 +58,8 @@ class BuyerSqlIntegrationTest {
         assertEquals(401,status("/buyer/cart",expired));
         assertEquals(401,status("/buyer/cart","invalid"));
         String sellerDigits=Long.toString(100000000000L+new java.security.SecureRandom().nextLong(900000000000L));
-        var sellerSession=auth.provisionSeller("qs_"+suffix,"qs_"+suffix+"@example.invalid",password,"QA","Seller","06"+sellerDigits,sellerDigits,"QA Shop "+suffix,"QA-"+suffix);
+        var sellerSession=auth.provisionSeller("qs_"+suffix,"qs_"+suffix+"@example.invalid",password,"QA","Seller","06"+sellerDigits,sellerDigits,
+            "QA Shop "+suffix,"QA Bank","QA ACCOUNT HOLDER","9704"+suffix,"QA Branch");
         String seller=Integer.toString(sellerSession.account().id());
         assertEquals(List.of("SELLER"),auth.login(sellerSession.account().email(),password).account().roles());
         assertTrue(auth.current(seller).roles().contains("SELLER"));

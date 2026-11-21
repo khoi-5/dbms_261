@@ -25,7 +25,8 @@ public class DemoSellerProvisioner implements ApplicationRunner {
     @Override public void run(ApplicationArguments args) {
         var result=auth.provisionSeller(required("DEMO_USERNAME"),required("DEMO_EMAIL"),required("DEMO_PASSWORD"),
             required("DEMO_FIRST_NAME"),required("DEMO_LAST_NAME"),required("DEMO_PHONE"),required("DEMO_CCCD"),
-            required("DEMO_SHOP_NAME"),required("DEMO_BANK_ACCOUNT"));
+            required("DEMO_SHOP_NAME"),required("DEMO_BANK_NAME"),required("DEMO_BANK_ACCOUNT_HOLDER"),
+            required("DEMO_BANK_ACCOUNT"),env.getProperty("DEMO_BANK_BRANCH"));
         System.out.println("Created new demo Seller: "+result.account().username()+". No existing account was changed.");
         context.close();
     }

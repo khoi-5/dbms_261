@@ -83,7 +83,7 @@ currentDb.accounts.insertMany([
   {
     _id: 1,
     username: "admin_root",
-    password_hash: "$2a$10$hashed_admin_pwd",
+    password_hash: "$2a$12$h1U/fVmlo3BtMYSWX7IseucGx96mQsrwnS1VcTBwm3hlIaAKxrtPe",
     fname: "Văn",
     lname: "Quản Trị",
     phone: "0901000001",
@@ -100,7 +100,7 @@ currentDb.accounts.insertMany([
   {
     _id: 2,
     username: "seller_fahasa",
-    password_hash: "$2a$10$hashed_seller_pwd1",
+    password_hash: "$2a$12$h1U/fVmlo3BtMYSWX7IseucGx96mQsrwnS1VcTBwm3hlIaAKxrtPe",
     fname: "Thị",
     lname: "Nhà Sách",
     phone: "0902000002",
@@ -111,17 +111,30 @@ currentDb.accounts.insertMany([
     cccd: "079090000002",
     date_of_birth: new Date("1990-10-20"),
     account_status: "ACTIVE",
-    roles: ["SELLER"],
+    roles: ["SELLER", "BUYER"],
     user_profile: { trust_score: 100 },
     seller_profile: {
       shop_name: "Fahasa Official Store",
-      bank_account_number: "190345678901"
+      bank_name: "Techcombank",
+      bank_account_holder: "CONG TY FAHASA",
+      bank_account_number: "190345678901",
+      bank_branch: "TP. Ho Chi Minh"
+    },
+    buyer_profile: {
+      addresses: [
+        {
+          receiver_name: "Trần Thị Mai",
+          phone: "0902000002",
+          address: "Quận 1, TP.HCM",
+          is_default: true
+        }
+      ]
     }
   },
   {
     _id: 3,
     username: "seller_coolmate",
-    password_hash: "$2a$10$hashed_seller_pwd2",
+    password_hash: "$2a$12$h1U/fVmlo3BtMYSWX7IseucGx96mQsrwnS1VcTBwm3hlIaAKxrtPe",
     fname: "Đức",
     lname: "Thời Trang",
     phone: "0903000003",
@@ -132,17 +145,30 @@ currentDb.accounts.insertMany([
     cccd: "079090000003",
     date_of_birth: new Date("1992-03-12"),
     account_status: "ACTIVE",
-    roles: ["SELLER"],
+    roles: ["SELLER", "BUYER"],
     user_profile: { trust_score: 98 },
     seller_profile: {
       shop_name: "Coolmate Activewear",
-      bank_account_number: "190345678902"
+      bank_name: "TPBank",
+      bank_account_holder: "CONG TY COOLMATE",
+      bank_account_number: "190345678902",
+      bank_branch: "TP. Ho Chi Minh"
+    },
+    buyer_profile: {
+      addresses: [
+        {
+          receiver_name: "Đức Thời Trang",
+          phone: "0903000003",
+          address: "Hà Đông, Hà Nội",
+          is_default: true
+        }
+      ]
     }
   },
   {
     _id: 4,
     username: "seller_cellphones",
-    password_hash: "$2a$10$hashed_seller_pwd3",
+    password_hash: "$2a$12$h1U/fVmlo3BtMYSWX7IseucGx96mQsrwnS1VcTBwm3hlIaAKxrtPe",
     fname: "Thành",
     lname: "Điện Máy",
     phone: "0904000004",
@@ -153,17 +179,30 @@ currentDb.accounts.insertMany([
     cccd: "079090000004",
     date_of_birth: new Date("1988-08-08"),
     account_status: "ACTIVE",
-    roles: ["SELLER"],
+    roles: ["SELLER", "BUYER"],
     user_profile: { trust_score: 95 },
     seller_profile: {
       shop_name: "CellphoneS Flagship",
-      bank_account_number: "190345678903"
+      bank_name: "Vietcombank",
+      bank_account_holder: "CONG TY CELLPHONES",
+      bank_account_number: "190345678903",
+      bank_branch: "Quan 1"
+    },
+    buyer_profile: {
+      addresses: [
+        {
+          receiver_name: "Thành Điện Máy",
+          phone: "0904000004",
+          address: "Bình Thạnh, TP.HCM",
+          is_default: true
+        }
+      ]
     }
   },
   {
     _id: 5,
     username: "buyer_hienle",
-    password_hash: "$2a$10$hashed_buyer_pwd1",
+    password_hash: "$2a$12$h1U/fVmlo3BtMYSWX7IseucGx96mQsrwnS1VcTBwm3hlIaAKxrtPe",
     fname: "Thúy",
     lname: "Lê Hiền",
     phone: "0905000005",
@@ -196,7 +235,7 @@ currentDb.accounts.insertMany([
   {
     _id: 6,
     username: "buyer_khoinguyen",
-    password_hash: "$2a$10$hashed_buyer_pwd2",
+    password_hash: "$2a$12$h1U/fVmlo3BtMYSWX7IseucGx96mQsrwnS1VcTBwm3hlIaAKxrtPe",
     fname: "Khôi",
     lname: "Nguyễn",
     phone: "0906000006",

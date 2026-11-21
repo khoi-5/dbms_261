@@ -24,12 +24,19 @@ public class AuthApi {
         @NotBlank @Size(max=50) String username, @NotBlank @Email @Size(max=100) String email,
         @NotBlank @Size(min=8,max=72) String password, @NotBlank @Size(max=50) String firstName,
         @NotBlank @Size(max=50) String lastName, @NotBlank @Size(max=20) String phone, @NotBlank @Pattern(regexp="[0-9]{9}|[0-9]{12}") String cccd,
-        @NotBlank @Size(max=100) String shopName, @NotBlank @Size(max=50) String bankAccount,
+        @NotBlank @Size(max=100) String shopName,
+        @NotBlank @Size(max=100) String bankName,
+        @NotBlank @Size(max=100) String bankAccountHolder,
+        @NotBlank @Pattern(regexp="[0-9]{6,50}") @Size(max=50) String bankAccount,
+        @Size(max=100) String bankBranch,
         @Size(min=8,max=72) String confirmPassword) {}
 
     public record BecomeSellerRequest(
         @NotBlank @Size(max=100) String shopName,
-        @NotBlank @Size(max=50) String bankAccount
+        @NotBlank @Size(max=100) String bankName,
+        @NotBlank @Size(max=100) String bankAccountHolder,
+        @NotBlank @Pattern(regexp="[0-9]{6,50}") @Size(max=50) String bankAccount,
+        @Size(max=100) String bankBranch
     ) {}
 
     @PostMapping("/auth/login")
@@ -50,13 +57,13 @@ public class AuthApi {
         if(r.confirmPassword()!=null && !r.password().equals(r.confirmPassword()))
             throw new ResponseStatusException(BAD_REQUEST,"Xác nhận mật khẩu không khớp");
         if(r.password().getBytes(StandardCharsets.UTF_8).length>72) throw new ResponseStatusException(BAD_REQUEST,"Mật khẩu tối đa 72 byte UTF-8");
-        return auth.provisionSeller(r.username(),r.email(),r.password(),r.firstName(),r.lastName(),r.phone(),r.cccd(),r.shopName(),r.bankAccount());
+        return auth.provisionSeller(r.username(),r.email(),r.password(),r.firstName(),r.lastName(),r.phone(),r.cccd(),r.shopName(),r.bankName(),r.bankAccountHolder(),r.bankAccount(),r.bankBranch());
     }
 
     @PostMapping("/auth/become-seller")
     public AccountAuthService.Session becomeSeller(@AuthenticationPrincipal Jwt jwt, @Valid @RequestBody BecomeSellerRequest r) {
         if (jwt == null || jwt.getSubject() == null) throw new ResponseStatusException(UNAUTHORIZED, "Vui lòng đăng nhập");
-        return auth.upgradeToSeller(jwt.getSubject(), r.shopName(), r.bankAccount());
+        return auth.upgradeToSeller(jwt.getSubject(), r.shopName(), r.bankName(), r.bankAccountHolder(), r.bankAccount(), r.bankBranch());
     }
     @GetMapping("/accounts/me")
     public AccountAuthService.Account me(@AuthenticationPrincipal Jwt jwt) { return auth.current(jwt.getSubject()); }

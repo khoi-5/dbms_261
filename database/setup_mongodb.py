@@ -63,7 +63,7 @@ def seed_small(db):
         {
             "_id": 1,
             "username": "admin_root",
-            "password_hash": "$2a$10$hashed_admin_pwd",
+            "password_hash": "$2a$12$h1U/fVmlo3BtMYSWX7IseucGx96mQsrwnS1VcTBwm3hlIaAKxrtPe",
             "fname": "Văn",
             "lname": "Quản Trị",
             "phone": "0901000001",
@@ -84,7 +84,7 @@ def seed_small(db):
         {
             "_id": 2,
             "username": "seller_fahasa",
-            "password_hash": "$2a$10$hashed_seller_pwd1",
+            "password_hash": "$2a$12$h1U/fVmlo3BtMYSWX7IseucGx96mQsrwnS1VcTBwm3hlIaAKxrtPe",
             "fname": "Thị",
             "lname": "Nhà Sách",
             "phone": "0902000002",
@@ -95,11 +95,24 @@ def seed_small(db):
             "cccd": "079090000002",
             "date_of_birth": datetime(1990, 10, 20),
             "account_status": "ACTIVE",
-            "roles": ["SELLER"],
+            "roles": ["SELLER", "BUYER"],
             "user_profile": { "trust_score": 100 },
             "seller_profile": {
                 "shop_name": "Fahasa Official Store",
-                "bank_account_number": "190345678901"
+                "bank_name": "Techcombank",
+                "bank_account_holder": "CONG TY FAHASA",
+                "bank_account_number": "190345678901",
+                "bank_branch": "TP. Ho Chi Minh"
+            },
+            "buyer_profile": {
+                "addresses": [
+                    {
+                        "receiver_name": "Trần Thị Mai",
+                        "phone": "0902000002",
+                        "address": "Quận 1, TP.HCM",
+                        "is_default": True
+                    }
+                ]
             },
             "created_at": _now,
             "created_by": 1,
@@ -109,7 +122,7 @@ def seed_small(db):
         {
             "_id": 3,
             "username": "seller_coolmate",
-            "password_hash": "$2a$10$hashed_seller_pwd2",
+            "password_hash": "$2a$12$h1U/fVmlo3BtMYSWX7IseucGx96mQsrwnS1VcTBwm3hlIaAKxrtPe",
             "fname": "Đức",
             "lname": "Thời Trang",
             "phone": "0903000003",
@@ -120,11 +133,24 @@ def seed_small(db):
             "cccd": "079090000003",
             "date_of_birth": datetime(1992, 3, 12),
             "account_status": "ACTIVE",
-            "roles": ["SELLER"],
+            "roles": ["SELLER", "BUYER"],
             "user_profile": { "trust_score": 98 },
             "seller_profile": {
                 "shop_name": "Coolmate Activewear",
-                "bank_account_number": "190345678902"
+                "bank_name": "TPBank",
+                "bank_account_holder": "CONG TY COOLMATE",
+                "bank_account_number": "190345678902",
+                "bank_branch": "TP. Ho Chi Minh"
+            },
+            "buyer_profile": {
+                "addresses": [
+                    {
+                        "receiver_name": "Đức Thời Trang",
+                        "phone": "0903000003",
+                        "address": "Hà Đông, Hà Nội",
+                        "is_default": True
+                    }
+                ]
             },
             "created_at": _now,
             "created_by": 1,
@@ -134,7 +160,7 @@ def seed_small(db):
         {
             "_id": 4,
             "username": "seller_cellphones",
-            "password_hash": "$2a$10$hashed_seller_pwd3",
+            "password_hash": "$2a$12$h1U/fVmlo3BtMYSWX7IseucGx96mQsrwnS1VcTBwm3hlIaAKxrtPe",
             "fname": "Thành",
             "lname": "Điện Máy",
             "phone": "0904000004",
@@ -145,11 +171,24 @@ def seed_small(db):
             "cccd": "079090000004",
             "date_of_birth": datetime(1988, 8, 8),
             "account_status": "ACTIVE",
-            "roles": ["SELLER"],
+            "roles": ["SELLER", "BUYER"],
             "user_profile": { "trust_score": 95 },
             "seller_profile": {
                 "shop_name": "CellphoneS Flagship",
-                "bank_account_number": "190345678903"
+                "bank_name": "Vietcombank",
+                "bank_account_holder": "CONG TY CELLPHONES",
+                "bank_account_number": "190345678903",
+                "bank_branch": "Quan 1"
+            },
+            "buyer_profile": {
+                "addresses": [
+                    {
+                        "receiver_name": "Thành Điện Máy",
+                        "phone": "0904000004",
+                        "address": "Bình Thạnh, TP.HCM",
+                        "is_default": True
+                    }
+                ]
             },
             "created_at": _now,
             "created_by": 1,
@@ -159,7 +198,7 @@ def seed_small(db):
         {
             "_id": 5,
             "username": "buyer_hienle",
-            "password_hash": "$2a$10$hashed_buyer_pwd1",
+            "password_hash": "$2a$12$h1U/fVmlo3BtMYSWX7IseucGx96mQsrwnS1VcTBwm3hlIaAKxrtPe",
             "fname": "Thúy",
             "lname": "Lê Hiền",
             "phone": "0905000005",
@@ -196,7 +235,7 @@ def seed_small(db):
         {
             "_id": 6,
             "username": "buyer_khoinguyen",
-            "password_hash": "$2a$10$hashed_buyer_pwd2",
+            "password_hash": "$2a$12$h1U/fVmlo3BtMYSWX7IseucGx96mQsrwnS1VcTBwm3hlIaAKxrtPe",
             "fname": "Khôi",
             "lname": "Nguyễn",
             "phone": "0906000006",
@@ -484,7 +523,7 @@ def seed_large(db):
         {
             "_id": 1,
             "username": "admin_root",
-            "password_hash": "$2a$10$hashed_admin_pwd",
+            "password_hash": "$2a$12$h1U/fVmlo3BtMYSWX7IseucGx96mQsrwnS1VcTBwm3hlIaAKxrtPe",
             "fname": "Văn",
             "lname": "Quản Trị",
             "phone": "0901000000",
@@ -511,7 +550,7 @@ def seed_large(db):
         acc = {
             "_id": user_id,
             "username": f"seller_{n:04d}" if is_seller else f"buyer_{n:04d}",
-            "password_hash": "$2a$10$encrypted_password_hash",
+            "password_hash": "$2a$12$h1U/fVmlo3BtMYSWX7IseucGx96mQsrwnS1VcTBwm3hlIaAKxrtPe",
             "fname": ["Nguyễn", "Trần", "Lê", "Phạm", "Hoàng"][n % 5],
             "lname": ["Anh Tuấn", "Thị Mai", "Minh Khôi", "Thúy Hiền"][n % 4],
             "phone": f"091{n:07d}",
@@ -522,7 +561,7 @@ def seed_large(db):
             "cccd": f"0791{n:08d}",
             "date_of_birth": now - timedelta(days=6000 + (n * 13 % 10000)),
             "account_status": "ACTIVE",
-            "roles": ["SELLER"] if is_seller else ["BUYER"],
+            "roles": ["SELLER", "BUYER"] if is_seller else ["BUYER"],
             "user_profile": { "trust_score": 80 + (n % 21) },
             "created_at": acc_created,
             "created_by": 1,
@@ -532,26 +571,28 @@ def seed_large(db):
         if is_seller:
             acc["seller_profile"] = {
                 "shop_name": f"Gian Hàng Official Shop {n}",
-                "bank_account_number": f"9704{n:012d}"
+                "bank_name": "Vietcombank",
+                "bank_account_holder": f"CHU TK GIAN HANG {user_id:04d}",
+                "bank_account_number": f"9704{user_id:012d}",
+                "bank_branch": "TP. Ho Chi Minh"
             }
-        else:
-            acc["buyer_profile"] = {
-                "addresses": [
-                    {
-                        "receiver_name": f"{acc['fname']} {acc['lname']}",
-                        "phone": acc["phone"],
-                        "address": acc["address"],
-                        "is_default": True
-                    }
-                ]
-            }
-            if n % 2 == 0:
-                acc["buyer_profile"]["addresses"].append({
+        acc["buyer_profile"] = {
+            "addresses": [
+                {
                     "receiver_name": f"{acc['fname']} {acc['lname']}",
                     "phone": acc["phone"],
-                    "address": f"Văn phòng: Tòa nhà Landmark {(n % 5 + 1)}, TP.HCM",
-                    "is_default": False
-                })
+                    "address": acc["address"],
+                    "is_default": True
+                }
+            ]
+        }
+        if n % 2 == 0:
+            acc["buyer_profile"]["addresses"].append({
+                "receiver_name": f"{acc['fname']} {acc['lname']}",
+                "phone": acc["phone"],
+                "address": f"Văn phòng công ty: Tầng {n % 15 + 1}, Tòa nhà Landmark {n % 5 + 1}, TP.HCM",
+                "is_default": False
+            })
         accounts.append(acc)
         
     db.accounts.insert_many(accounts, ordered=False)
@@ -654,6 +695,7 @@ def seed_large(db):
             ]
         
         prod_created = now - timedelta(days=n % 300)
+        variant_prices = [variant["price"] for variant in variants]
         products.append({
             "_id": n,
             "seller_id": seller_id,
@@ -664,8 +706,8 @@ def seed_large(db):
             "product_type": p_type,
             "attributes": attrs,
             "variants": variants,
-            "min_price": base_price,
-            "max_price": base_price * 2.0,
+            "min_price": min(variant_prices),
+            "max_price": max(variant_prices),
             "total_stock": 180,
             "rating_avg": 4.5,
             "created_at": prod_created,

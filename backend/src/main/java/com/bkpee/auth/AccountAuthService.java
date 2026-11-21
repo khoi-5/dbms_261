@@ -49,16 +49,17 @@ public class AccountAuthService {
     }
     @Transactional
     public Session register(String username, String email, String password, String firstName, String lastName, String phone, String cccd) {
-        return create(username,email,password,firstName,lastName,phone,cccd,null,null);
+        return create(username,email,password,firstName,lastName,phone,cccd,null,null,null,null,null);
     }
     /** Local opt-in provisioner only. Never exposed as a public registration endpoint. */
     @Transactional
-    public Session provisionSeller(String username, String email, String password, String firstName, String lastName, String phone, String cccd, String shopName, String bankAccount) {
-        if(shopName==null || shopName.isBlank() || shopName.length()>100 || bankAccount==null || bankAccount.isBlank() || bankAccount.length()>50)
-            throw new ResponseStatusException(BAD_REQUEST,"Tên shop hoặc tài khoản ngân hàng không hợp lệ");
-        return create(username,email,password,firstName,lastName,phone,cccd,shopName,bankAccount);
+    public Session provisionSeller(String username, String email, String password, String firstName, String lastName, String phone, String cccd,
+                                    String shopName, String bankName, String bankAccountHolder, String bankAccount, String bankBranch) {
+        validateSellerBank(shopName, bankName, bankAccountHolder, bankAccount, bankBranch);
+        return create(username,email,password,firstName,lastName,phone,cccd,shopName,bankName,bankAccountHolder,bankAccount,bankBranch);
     }
-    private Session create(String username, String email, String password, String firstName, String lastName, String phone, String cccd, String shopName, String bankAccount) {
+    private Session create(String username, String email, String password, String firstName, String lastName, String phone, String cccd,
+                           String shopName, String bankName, String bankAccountHolder, String bankAccount, String bankBranch) {
         if(password==null || password.length()<8 || password.getBytes(java.nio.charset.StandardCharsets.UTF_8).length>72
             || username==null || username.length()>50 || email==null || email.length()>100 || !email.matches("[^\\s@]+@[^\\s@]+\\.[^\\s@]+")
             || firstName==null || firstName.length()>50 || lastName==null || lastName.length()>50 || phone==null || cccd==null)
@@ -80,23 +81,35 @@ public class AccountAuthService {
         db.update("INSERT INTO Buyer (Account_ID) VALUES (?)",id);
         db.update("INSERT INTO Cart (Buyer_ID) VALUES (?)",id);
         if(shopName!=null) {
-            db.update("INSERT INTO Seller (Account_ID,Shop_Name,Bank_Account_Number) VALUES (?,?,?)",id,shopName.trim(),bankAccount.trim());
+            db.update("INSERT INTO Seller (Account_ID,Shop_Name,Bank_Name,Bank_Account_Holder,Bank_Account_Number,Bank_Branch) VALUES (?,?,?,?,?,?)",
+                id,shopName.trim(),bankName.trim(),bankAccountHolder.trim(),bankAccount.trim(),
+                bankBranch==null || bankBranch.isBlank() ? null : bankBranch.trim());
         }
         var user=current(Integer.toString(id));
         return new Session(jwt.generateToken(Integer.toString(id),user.roles()),user);
     }
 
     @Transactional
-    public Session upgradeToSeller(String subject, String shopName, String bankAccount) {
+    public Session upgradeToSeller(String subject, String shopName, String bankName, String bankAccountHolder, String bankAccount, String bankBranch) {
         int id;
         try { id = Integer.parseInt(subject); } catch (NumberFormatException e) { throw new ResponseStatusException(UNAUTHORIZED, "Phiên không hợp lệ"); }
-        if(shopName==null || shopName.isBlank() || shopName.length()>100 || bankAccount==null || bankAccount.isBlank() || bankAccount.length()>50)
-            throw new ResponseStatusException(BAD_REQUEST,"Tên shop hoặc tài khoản ngân hàng không hợp lệ");
+        validateSellerBank(shopName,bankName,bankAccountHolder,bankAccount,bankBranch);
         var existing = db.queryForList("SELECT Account_ID FROM Seller WHERE Account_ID=?", id);
         if(existing.isEmpty()) {
-            db.update("INSERT INTO Seller (Account_ID,Shop_Name,Bank_Account_Number) VALUES (?,?,?)", id, shopName.trim(), bankAccount.trim());
+            db.update("INSERT INTO Seller (Account_ID,Shop_Name,Bank_Name,Bank_Account_Holder,Bank_Account_Number,Bank_Branch) VALUES (?,?,?,?,?,?)",
+                id,shopName.trim(),bankName.trim(),bankAccountHolder.trim(),bankAccount.trim(),
+                bankBranch==null || bankBranch.isBlank() ? null : bankBranch.trim());
         }
         var user = current(Integer.toString(id));
         return new Session(jwt.generateToken(Integer.toString(id), user.roles()), user);
+    }
+
+    private void validateSellerBank(String shopName, String bankName, String bankAccountHolder, String bankAccount, String bankBranch) {
+        if(shopName==null || shopName.isBlank() || shopName.length()>100
+            || bankName==null || bankName.isBlank() || bankName.length()>100
+            || bankAccountHolder==null || bankAccountHolder.isBlank() || bankAccountHolder.length()>100
+            || bankAccount==null || !bankAccount.matches("[0-9]{6,50}")
+            || bankBranch!=null && bankBranch.length()>100)
+            throw new ResponseStatusException(BAD_REQUEST,"Thông tin gian hàng hoặc tài khoản ngân hàng không hợp lệ");
     }
 }

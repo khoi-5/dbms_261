@@ -29,7 +29,14 @@ export function AuthProvider({ children }) {
     tokenStore.set(session.token); setUser(session.account); setError('');
     return session.account;
   };
+  const becomeSeller = async (body) => {
+    const session = await api('/auth/become-seller', { method: 'POST', body });
+    tokenStore.set(session.token);
+    setUser(session.account);
+    setError('');
+    return session.account;
+  };
   const refreshUser = async () => { const account = await api('/accounts/me'); setUser(account); return account; };
-  return <AuthContext.Provider value={{ user, loading, error, logout, authenticate, refreshUser }}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={{ user, loading, error, logout, authenticate, becomeSeller, refreshUser }}>{children}</AuthContext.Provider>;
 }
 export const useAuth = () => useContext(AuthContext);

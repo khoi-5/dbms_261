@@ -255,13 +255,50 @@ export default function AuthPage({ register = false }) {
                   </div>
                   <div>
                     <label style={{ fontSize: '11px', fontWeight: '600', color: '#475569', display: 'block', marginBottom: '4px' }}>
-                      Tài khoản ngân hàng *
+                      Tên ngân hàng *
+                    </label>
+                    <input
+                      name="bankName"
+                      required
+                      maxLength={100}
+                      placeholder="Ví dụ: Techcombank"
+                      style={{ width: '100%', padding: '8px 10px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '13px', boxSizing: 'border-box' }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: '11px', fontWeight: '600', color: '#475569', display: 'block', marginBottom: '4px' }}>
+                      Tên chủ tài khoản *
+                    </label>
+                    <input
+                      name="bankAccountHolder"
+                      required
+                      maxLength={100}
+                      placeholder="Ví dụ: NGUYEN VAN A"
+                      style={{ width: '100%', padding: '8px 10px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '13px', boxSizing: 'border-box' }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: '11px', fontWeight: '600', color: '#475569', display: 'block', marginBottom: '4px' }}>
+                      Số tài khoản ngân hàng *
                     </label>
                     <input
                       name="bankAccount"
                       required
+                      inputMode="numeric"
+                      pattern="[0-9]{6,50}"
                       maxLength={50}
-                      placeholder="Ví dụ: 19036789123456 (Techcombank)"
+                      placeholder="Ví dụ: 19036789123456"
+                      style={{ width: '100%', padding: '8px 10px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '13px', boxSizing: 'border-box' }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: '11px', fontWeight: '600', color: '#475569', display: 'block', marginBottom: '4px' }}>
+                      Chi nhánh ngân hàng
+                    </label>
+                    <input
+                      name="bankBranch"
+                      maxLength={100}
+                      placeholder="Ví dụ: Chi nhánh TP. Thủ Đức"
                       style={{ width: '100%', padding: '8px 10px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '13px', boxSizing: 'border-box' }}
                     />
                   </div>

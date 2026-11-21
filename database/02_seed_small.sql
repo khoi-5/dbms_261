@@ -85,10 +85,10 @@ INSERT INTO [User] (Account_ID, Trust_Score) VALUES
 GO
 
 -- 3. Sellers & Buyers (Overlapping Specialization: Seller cũng là Buyer)
-INSERT INTO Seller (Account_ID, Shop_Name, Bank_Account_Number) VALUES
-(2, N'Fahasa Official Store', '190345678901'),
-(3, N'Coolmate Activewear', '190345678902'),
-(4, N'CellphoneS Flagship', '190345678903');
+INSERT INTO Seller (Account_ID, Shop_Name, Bank_Name, Bank_Account_Holder, Bank_Account_Number, Bank_Branch) VALUES
+(2, N'Fahasa Official Store', N'Techcombank', N'CONG TY FAHASA', '190345678901', N'TP. Ho Chi Minh'),
+(3, N'Coolmate Activewear', N'TPBank', N'CONG TY COOLMATE', '190345678902', N'TP. Ho Chi Minh'),
+(4, N'CellphoneS Flagship', N'Vietcombank', N'CONG TY CELLPHONES', '190345678903', N'Quan 1');
 
 INSERT INTO Buyer (Account_ID) VALUES
 (2),

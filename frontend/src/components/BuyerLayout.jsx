@@ -2,11 +2,13 @@ import { NavLink, Outlet, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
 import { useState, useEffect } from 'react';
 import { api } from '../services/api';
+import BecomeSellerModal from './BecomeSellerModal';
 
 export default function BuyerLayout() {
   const { user, logout, error } = useAuth();
   const navigate = useNavigate();
   const [cartCount, setCartCount] = useState(0);
+  const [showBecomeSellerModal, setShowBecomeSellerModal] = useState(false);
 
   useEffect(() => {
     if (!user) {
@@ -295,21 +297,7 @@ export default function BuyerLayout() {
             <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: '1px dashed #e2e8f0' }}>
               <button
                 type="button"
-                onClick={async () => {
-                  const shopName = prompt('Nhập Tên Gian Hàng bạn muốn mở:');
-                  if (!shopName) return;
-                  const bankAccount = prompt('Nhập Số Tài Khoản Ngân Hàng nhận tiền:') || '19036789123456';
-                  try {
-                    await api('/auth/become-seller', {
-                      method: 'POST',
-                      body: { shopName, bankAccount }
-                    });
-                    alert('Chúc mừng! Bạn đã đăng ký mở gian hàng thành công. Đang chuyển tới Kênh Người Bán...');
-                    window.location.href = '/seller/products';
-                  } catch (e) {
-                    alert(e.message || 'Không thể mở gian hàng.');
-                  }
-                }}
+                onClick={() => setShowBecomeSellerModal(true)}
                 style={{
                   width: '100%',
                   padding: '10px',
@@ -421,7 +409,15 @@ export default function BuyerLayout() {
         )}
         <Outlet />
       </main>
-
+      {showBecomeSellerModal && (
+        <BecomeSellerModal
+          onClose={() => setShowBecomeSellerModal(false)}
+          onSuccess={() => {
+            setShowBecomeSellerModal(false);
+            navigate('/seller/products', { replace: true });
+          }}
+        />
+      )}
     </div>
   );
 }

@@ -65,6 +65,75 @@ export default function SellerLayout() {
           </div>
         </div>
 
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px',
+          padding: '8px 12px',
+          backgroundColor: '#f8fafc',
+          borderRadius: '12px',
+          marginBottom: '20px',
+          border: '1px solid #f1f5f9'
+        }}>
+          <Link
+            to="/profile"
+            title="Cài đặt hồ sơ"
+            style={{
+              width: '32px',
+              height: '32px',
+              borderRadius: '50%',
+              backgroundColor: '#2563eb',
+              color: '#ffffff',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontWeight: '700',
+              fontSize: '13px',
+              textDecoration: 'none'
+            }}
+          >
+            {initial}
+          </Link>
+          <Link
+            to="/profile"
+            style={{ color: '#64748b', display: 'flex', alignItems: 'center', padding: '4px' }}
+            title="Cài đặt hồ sơ"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+          </Link>
+          <button
+            type="button"
+            title="Thông báo"
+            aria-label="Thông báo"
+            style={{
+              position: 'relative',
+              color: '#64748b',
+              display: 'flex',
+              alignItems: 'center',
+              padding: '4px',
+              marginLeft: 'auto',
+              background: 'transparent'
+            }}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+            </svg>
+            <span style={{
+              position: 'absolute',
+              top: '2px',
+              right: '2px',
+              width: '6px',
+              height: '6px',
+              backgroundColor: '#ef4444',
+              borderRadius: '50%'
+            }}></span>
+          </button>
+        </div>
+
         <nav style={{ flex: 1 }}>
           <NavLink to="/seller/dashboard" style={({ isActive }) => navItemStyle(isActive)}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

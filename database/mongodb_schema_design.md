@@ -83,6 +83,28 @@ Trong MongoDB (NoSQL Document Store), chúng ta áp dụng mô hình **Data Mode
 }
 ```
 
+Tài khoản có role Seller nhúng thông tin nhận tiền trong `seller_profile`, đồng bộ với các cột
+`Shop_Name`, `Bank_Name`, `Bank_Account_Holder`, `Bank_Account_Number` và `Bank_Branch`
+trong bảng `Seller` của SQL Server:
+
+```json
+{
+  "_id": 2,
+  "username": "seller_fahasa",
+  "roles": ["SELLER", "BUYER"],
+  "seller_profile": {
+    "shop_name": "Fahasa Official Store",
+    "bank_name": "Techcombank",
+    "bank_account_holder": "CONG TY FAHASA",
+    "bank_account_number": "190345678901",
+    "bank_branch": "TP. Ho Chi Minh"
+  },
+  "buyer_profile": {
+    "addresses": []
+  }
+}
+```
+
 ### 3.2. Collection: `categories`
 ```json
 {
