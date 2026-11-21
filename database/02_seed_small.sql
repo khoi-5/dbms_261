@@ -62,15 +62,15 @@ GO
 
 PRINT N'[*] Đang nạp dữ liệu mẫu mới...';
 
--- 1. Account (Admin, Sellers, Buyers)
+-- 1. Account (Admin, Sellers, Buyers) - Tất cả mật khẩu là 12345678
 INSERT INTO Account (Username, password, FName, LName, Phone, Account_Status, Email, Gender, avatar, Address, CCCD, Date_Of_Birth, Created_At, Created_By, Updated_At, Updated_By)
 VALUES
-(N'admin_root',      N'$2a$10$hashed_admin_pwd',    N'Văn',   N'Quản Trị', '0901000001', N'ACTIVE', 'admin@bkpee.vn',        N'Nam', N'https://bkpee.vn/img/admin.png',      N'Quận 10, TP.HCM',       '079090000001', '1995-05-15', GETDATE(), 1, GETDATE(), 1),
-(N'seller_fahasa',   N'$2a$10$hashed_seller_pwd1',  N'Thị',   N'Nhà Sách', '0902000002', N'ACTIVE', 'fahasa@bkpee.vn',        N'Nữ', N'https://bkpee.vn/img/fahasa.png',     N'Quận 1, TP.HCM',        '079090000002', '1990-10-20', GETDATE(), 1, GETDATE(), 1),
-(N'seller_coolmate', N'$2a$10$hashed_seller_pwd2',  N'Đức',   N'Thời Trang', '0903000003', N'ACTIVE', 'coolmate@bkpee.vn',      N'Nam', N'https://bkpee.vn/img/coolmate.png',   N'Hà Đông, Hà Nội',      '079090000003', '1992-03-12', GETDATE(), 1, GETDATE(), 1),
-(N'seller_cellphones',N'$2a$10$hashed_seller_pwd3', N'Thành', N'Điện Máy', '0904000004', N'ACTIVE', 'cellphones@bkpee.vn',   N'Nam', N'https://bkpee.vn/img/cellphones.png', N'Bình Thạnh, TP.HCM',    '079090000004', '1988-08-08', GETDATE(), 1, GETDATE(), 1),
-(N'buyer_hienle',    N'$2a$10$hashed_buyer_pwd1',   N'Thúy',  N'Lê Hiền', '0905000005', N'ACTIVE', 'thuyhien@bkpee.vn',      N'Nữ', N'https://bkpee.vn/img/buyer1.png',    N'Thủ Đức, TP.HCM',       '079090000005', '2003-07-25', GETDATE(), 1, GETDATE(), 1),
-(N'buyer_khoinguyen',N'$2a$10$hashed_buyer_pwd2',   N'Khôi',  N'Nguyễn',  '0906000006', N'ACTIVE', 'khoinguyen@bkpee.vn',    N'Nam', N'https://bkpee.vn/img/buyer2.png',    N'Quận 7, TP.HCM',        '079090000006', '2002-11-14', GETDATE(), 1, GETDATE(), 1);
+(N'admin_root',      N'$2a$12$h1U/fVmlo3BtMYSWX7IseucGx96mQsrwnS1VcTBwm3hlIaAKxrtPe', N'Văn',   N'Quản Trị', '0901000001', N'ACTIVE', 'admin@bkpee.vn',        N'Nam', N'https://bkpee.vn/img/admin.png',      N'Quận 10, TP.HCM',       '079090000001', '1995-05-15', GETDATE(), 1, GETDATE(), 1),
+(N'seller_fahasa',   N'$2a$12$h1U/fVmlo3BtMYSWX7IseucGx96mQsrwnS1VcTBwm3hlIaAKxrtPe', N'Thị',   N'Nhà Sách', '0902000002', N'ACTIVE', 'fahasa@bkpee.vn',        N'Nữ', N'https://bkpee.vn/img/fahasa.png',     N'Quận 1, TP.HCM',        '079090000002', '1990-10-20', GETDATE(), 1, GETDATE(), 1),
+(N'seller_coolmate', N'$2a$12$h1U/fVmlo3BtMYSWX7IseucGx96mQsrwnS1VcTBwm3hlIaAKxrtPe', N'Đức',   N'Thời Trang', '0903000003', N'ACTIVE', 'coolmate@bkpee.vn',      N'Nam', N'https://bkpee.vn/img/coolmate.png',   N'Hà Đông, Hà Nội',      '079090000003', '1992-03-12', GETDATE(), 1, GETDATE(), 1),
+(N'seller_cellphones',N'$2a$12$h1U/fVmlo3BtMYSWX7IseucGx96mQsrwnS1VcTBwm3hlIaAKxrtPe', N'Thành', N'Điện Máy', '0904000004', N'ACTIVE', 'cellphones@bkpee.vn',   N'Nam', N'https://bkpee.vn/img/cellphones.png', N'Bình Thạnh, TP.HCM',    '079090000004', '1988-08-08', GETDATE(), 1, GETDATE(), 1),
+(N'buyer_hienle',    N'$2a$12$h1U/fVmlo3BtMYSWX7IseucGx96mQsrwnS1VcTBwm3hlIaAKxrtPe', N'Thúy',  N'Lê Hiền', '0905000005', N'ACTIVE', 'thuyhien@bkpee.vn',      N'Nữ', N'https://bkpee.vn/img/buyer1.png',    N'Thủ Đức, TP.HCM',       '079090000005', '2003-07-25', GETDATE(), 1, GETDATE(), 1),
+(N'buyer_khoinguyen',N'$2a$12$h1U/fVmlo3BtMYSWX7IseucGx96mQsrwnS1VcTBwm3hlIaAKxrtPe', N'Khôi',  N'Nguyễn',  '0906000006', N'ACTIVE', 'khoinguyen@bkpee.vn',    N'Nam', N'https://bkpee.vn/img/buyer2.png',    N'Quận 7, TP.HCM',        '079090000006', '2002-11-14', GETDATE(), 1, GETDATE(), 1);
 GO
 
 -- 2. Phân quyền User và Admin
@@ -84,26 +84,35 @@ INSERT INTO [User] (Account_ID, Trust_Score) VALUES
 (6, 100);
 GO
 
--- 3. Sellers & Buyers
+-- 3. Sellers & Buyers (Overlapping Specialization: Seller cũng là Buyer)
 INSERT INTO Seller (Account_ID, Shop_Name, Bank_Account_Number) VALUES
 (2, N'Fahasa Official Store', '190345678901'),
 (3, N'Coolmate Activewear', '190345678902'),
 (4, N'CellphoneS Flagship', '190345678903');
 
 INSERT INTO Buyer (Account_ID) VALUES
+(2),
+(3),
+(4),
 (5),
 (6);
 GO
 
 -- 4. Buyer_Infor (Sổ địa chỉ)
 INSERT INTO Buyer_Infor (Buyer_ID, Address, Receiver_Name, Phone) VALUES
+(2, N'Quận 1, TP.HCM', N'Trần Thị Mai', '0902000002'),
+(3, N'Hà Đông, Hà Nội', N'Đức Thời Trang', '0903000003'),
+(4, N'Bình Thạnh, TP.HCM', N'Thành Điện Máy', '0904000004'),
 (5, N'KTX Khu A ĐHQG TP.HCM, Dĩ An, Bình Dương', N'Lê Hiền Thúy', '0905000005'),
 (5, N'Nhà riêng: 123 Võ Văn Ngân, Thủ Đức, TP.HCM', N'Lê Hiền Thúy', '0905000005'),
 (6, N'456 Nguyễn Lương Bằng, Quận 7, TP.HCM', N'Nguyễn Khôi', '0906000006');
 GO
 
--- 5. Giỏ hàng cho Buyers
+-- 5. Giỏ hàng cho Buyers (Bao gồm cả các Seller)
 INSERT INTO Cart (Total_product, Buyer_ID, Created_At, Created_By, Updated_At, Updated_By) VALUES
+(0, 2, GETDATE(), 2, GETDATE(), 2),
+(0, 3, GETDATE(), 3, GETDATE(), 3),
+(0, 4, GETDATE(), 4, GETDATE(), 4),
 (0, 5, GETDATE(), 5, GETDATE(), 5),
 (0, 6, GETDATE(), 6, GETDATE(), 6);
 GO
@@ -116,13 +125,13 @@ INSERT INTO Shipping_Provider (Provider_Name, Phone, Address, Admin_ID, Base_Shi
 GO
 
 -- 7. Danh mục (Cây đệ quy)
-INSERT INTO Category (Category_Name, Parent_Category_ID, Admin_ID, Created_At, Created_By, Updated_At, Updated_By) VALUES
-(N'Sách & Văn Phòng Phẩm', NULL, 1, GETDATE(), 1, GETDATE(), 1),   -- Category 1
-(N'Thời Trang & May Mặc',   NULL, 1, GETDATE(), 1, GETDATE(), 1),   -- Category 2
-(N'Thiết Bị Điện Tử',       NULL, 1, GETDATE(), 1, GETDATE(), 1),   -- Category 3
-(N'Sách Công Nghệ & Kỹ Thuật', 1,    1, GETDATE(), 1, GETDATE(), 1),   -- Category 4 (con của 1)
-(N'Áo Thun Nam Nữ',          2,    1, GETDATE(), 1, GETDATE(), 1),   -- Category 5 (con của 2)
-(N'Tai Nghe & Phụ Kiện',     3,    1, GETDATE(), 1, GETDATE(), 1);  -- Category 6 (con của 3)
+INSERT INTO Category (Category_Name, Parent_Category_ID, Target_Type, Admin_ID, Created_At, Created_By, Updated_At, Updated_By) VALUES
+(N'Sách & Văn Phòng Phẩm', NULL, 'BOOK',        1, GETDATE(), 1, GETDATE(), 1),   -- Category 1
+(N'Thời Trang & May Mặc',   NULL, 'CLOTHES',     1, GETDATE(), 1, GETDATE(), 1),   -- Category 2
+(N'Thiết Bị Điện Tử',       NULL, 'ELECTRONICS', 1, GETDATE(), 1, GETDATE(), 1),   -- Category 3
+(N'Sách Công Nghệ & Kỹ Thuật', 1,    'BOOK',        1, GETDATE(), 1, GETDATE(), 1),   -- Category 4 (con của 1)
+(N'Áo Thun Nam Nữ',          2,    'CLOTHES',     1, GETDATE(), 1, GETDATE(), 1),   -- Category 5 (con của 2)
+(N'Tai Nghe & Phụ Kiện',     3,    'ELECTRONICS', 1, GETDATE(), 1, GETDATE(), 1);  -- Category 6 (con của 3)
 GO
 
 -- 8. Sản phẩm & Bảng con chuyên biệt
@@ -142,15 +151,15 @@ INSERT INTO Electronics (Product_ID, Warranty_ID, Warranty_Time) VALUES (3, 'BH-
 GO
 
 -- 9. Biến thể sản phẩm (Product_Variant)
-INSERT INTO Product_Variant (Product_ID, Price, Is_Active, Quantity_Stock, Image) VALUES
-(1, 120000, 1, 150, N'https://bkpee.vn/img/books/csdl-tap1.png'),      -- Variant 1
-(1, 180000, 1, 50,  N'https://bkpee.vn/img/books/csdl-biacung.png'),    -- Variant 2
-(2, 199000, 1, 80,  N'https://bkpee.vn/img/clothes/aothun-den-l.png'),  -- Variant 3
-(2, 199000, 1, 40,  N'https://bkpee.vn/img/clothes/aothun-trang-m.png'),-- Variant 4
-(3, 7990000, 1, 25, N'https://bkpee.vn/img/electronics/sony-bac.png');  -- Variant 5
+INSERT INTO Product_Variant (Product_ID, Price, Is_Active, Quantity_Stock, Image, Variant_Name) VALUES
+(1, 120000, 1, 150, N'https://bkpee.vn/img/books/csdl-tap1.png', N'Tập 1 - Bìa mềm'),
+(1, 180000, 1, 50,  N'https://bkpee.vn/img/books/csdl-biacung.png', N'Trọn bộ - Bìa cứng'),
+(2, 199000, 1, 80,  N'https://bkpee.vn/img/clothes/aothun-den-l.png', N'Size L - Đen'),
+(2, 199000, 1, 40,  N'https://bkpee.vn/img/clothes/aothun-trang-m.png', N'Size M - Trắng'),
+(3, 7990000, 1, 25, N'https://bkpee.vn/img/electronics/sony-bac.png', N'Màu Bạc - Bản Quốc Tế');
 GO
 
--- 10. Giỏ hàng chi tiết
+-- 10. Giỏ hàng chi tiết (Cart_ID = 1 tương ứng với Buyer đầu tiên)
 INSERT INTO Cart_Item (Cart_ID, Variant_ID, Quantity) VALUES
 (1, 1, 1),
 (1, 3, 2);

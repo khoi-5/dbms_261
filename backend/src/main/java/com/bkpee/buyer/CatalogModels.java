@@ -8,14 +8,34 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
 public final class CatalogModels {
     private CatalogModels() {}
-    public record Category(int id, String name, Integer parentId) {}
+    public record Category(int id, String name, Integer parentId, String targetType) {
+        public Category(int id, String name, Integer parentId) {
+            this(id, name, parentId, "GENERAL");
+        }
+    }
     public record Product(int id, String name, int categoryId, String category,
-                          BigDecimal price, int variantCount, String image) {}
-    public record Variant(int id, int productId, BigDecimal price, int stock, String image) {}
+                          BigDecimal price, BigDecimal maxPrice, int variantCount, String image, String productType) {}
+    public record Variant(int id, int productId, BigDecimal price, int stock, String image, String variantName) {}
     public record Page(List<Product> items, int page, int size, long totalElements, long totalPages) {}
-    public record Query(String keyword, Integer categoryId, BigDecimal minPrice, BigDecimal maxPrice,
+
+    public record ProductDetail(
+        int id, String name, String description, String manufacturer,
+        int categoryId, String categoryName, int sellerId, String shopName,
+        String productType, // "BOOK", "CLOTHES", "ELECTRONICS", "OTHER"
+        String publisher, List<String> authors, // Books
+        String material, // Clothes
+        String warrantyId, String warrantyTime, // Electronics
+        List<Variant> variants
+    ) {}
+
+    public record Query(String keyword, Integer categoryId, String format, BigDecimal minPrice, BigDecimal maxPrice,
                         int page, int size) {
         public static Query of(String keyword, Integer categoryId, BigDecimal minPrice, BigDecimal maxPrice,
+                               int page, Integer size, CatalogSettings settings) {
+            return of(keyword, categoryId, null, minPrice, maxPrice, page, size, settings);
+        }
+
+        public static Query of(String keyword, Integer categoryId, String format, BigDecimal minPrice, BigDecimal maxPrice,
                                int page, Integer size, CatalogSettings settings) {
             String normalized = Normalizer.normalize(keyword == null ? "" : keyword.replaceAll("(?U)^\\s+|\\s+$", ""), Normalizer.Form.NFC);
             int requestedSize = size == null ? settings.defaultPageSize() : size;
@@ -25,7 +45,8 @@ public final class CatalogModels {
             validatePrice(minPrice); validatePrice(maxPrice);
             if (minPrice != null && maxPrice != null && minPrice.compareTo(maxPrice) > 0)
                 throw new ResponseStatusException(BAD_REQUEST, "Giá tối thiểu phải nhỏ hơn hoặc bằng giá tối đa");
-            return new Query(normalized, categoryId, minPrice, maxPrice, page, requestedSize);
+            String fmt = format == null || format.isBlank() ? null : format.trim().toUpperCase();
+            return new Query(normalized, categoryId, fmt, minPrice, maxPrice, page, requestedSize);
         }
         private static void validatePrice(BigDecimal price) {
             if (price != null && (price.signum() < 0 || price.stripTrailingZeros().scale() > 2

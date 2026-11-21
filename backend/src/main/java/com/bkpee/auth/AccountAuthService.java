@@ -77,11 +77,26 @@ public class AccountAuthService {
         },key);
         int id=Objects.requireNonNull(key.getKey()).intValue();
         db.update("INSERT INTO [User] (Account_ID) VALUES (?)",id);
-        if(shopName==null) {
-            db.update("INSERT INTO Buyer (Account_ID) VALUES (?)",id);
-            db.update("INSERT INTO Cart (Buyer_ID) VALUES (?)",id);
-        } else db.update("INSERT INTO Seller (Account_ID,Shop_Name,Bank_Account_Number) VALUES (?,?,?)",id,shopName.trim(),bankAccount.trim());
+        db.update("INSERT INTO Buyer (Account_ID) VALUES (?)",id);
+        db.update("INSERT INTO Cart (Buyer_ID) VALUES (?)",id);
+        if(shopName!=null) {
+            db.update("INSERT INTO Seller (Account_ID,Shop_Name,Bank_Account_Number) VALUES (?,?,?)",id,shopName.trim(),bankAccount.trim());
+        }
         var user=current(Integer.toString(id));
         return new Session(jwt.generateToken(Integer.toString(id),user.roles()),user);
+    }
+
+    @Transactional
+    public Session upgradeToSeller(String subject, String shopName, String bankAccount) {
+        int id;
+        try { id = Integer.parseInt(subject); } catch (NumberFormatException e) { throw new ResponseStatusException(UNAUTHORIZED, "Phiên không hợp lệ"); }
+        if(shopName==null || shopName.isBlank() || shopName.length()>100 || bankAccount==null || bankAccount.isBlank() || bankAccount.length()>50)
+            throw new ResponseStatusException(BAD_REQUEST,"Tên shop hoặc tài khoản ngân hàng không hợp lệ");
+        var existing = db.queryForList("SELECT Account_ID FROM Seller WHERE Account_ID=?", id);
+        if(existing.isEmpty()) {
+            db.update("INSERT INTO Seller (Account_ID,Shop_Name,Bank_Account_Number) VALUES (?,?,?)", id, shopName.trim(), bankAccount.trim());
+        }
+        var user = current(Integer.toString(id));
+        return new Session(jwt.generateToken(Integer.toString(id), user.roles()), user);
     }
 }

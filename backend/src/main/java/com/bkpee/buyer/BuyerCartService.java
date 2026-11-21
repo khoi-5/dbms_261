@@ -16,16 +16,21 @@ public class BuyerCartService {
     private final AccountAuthService auth;
     public BuyerCartService(JdbcTemplate db,AccountAuthService auth) { this.db=db; this.auth=auth; }
     private int buyerId(String subject) {
-        var user=auth.current(subject);
-        if(!user.roles().contains("BUYER")) throw new ResponseStatusException(FORBIDDEN,"Chỉ Buyer được sử dụng giỏ");
+        var user = auth.current(subject);
         return user.id();
     }
     private int cartForWrite(String subject) {
         int buyerId = buyerId(subject);
-        // Serialize all writes for this Buyer, including lazy cart creation.
-        db.queryForObject("SELECT Account_ID FROM Buyer WITH (UPDLOCK,HOLDLOCK) WHERE Account_ID=?",Integer.class,buyerId);
-        var ids=db.queryForList("SELECT Cart_ID FROM Cart WHERE Buyer_ID=?",Integer.class,buyerId);
-        if(ids.isEmpty()) { db.update("INSERT INTO Cart (Buyer_ID) VALUES (?)",buyerId); return db.queryForObject("SELECT Cart_ID FROM Cart WHERE Buyer_ID=?",Integer.class,buyerId); }
+        // Overlapping Specialization: Auto-provision Buyer record for any active user (including Sellers)
+        var buyers = db.queryForList("SELECT Account_ID FROM Buyer WITH (UPDLOCK,HOLDLOCK) WHERE Account_ID=?", Integer.class, buyerId);
+        if (buyers.isEmpty()) {
+            db.update("INSERT INTO Buyer (Account_ID) VALUES (?)", buyerId);
+        }
+        var ids = db.queryForList("SELECT Cart_ID FROM Cart WHERE Buyer_ID=?", Integer.class, buyerId);
+        if (ids.isEmpty()) {
+            db.update("INSERT INTO Cart (Buyer_ID) VALUES (?)", buyerId);
+            return db.queryForObject("SELECT Cart_ID FROM Cart WHERE Buyer_ID=?", Integer.class, buyerId);
+        }
         return ids.getFirst();
     }
     @Transactional(readOnly=true)

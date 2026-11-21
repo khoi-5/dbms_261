@@ -6,10 +6,15 @@ export const tokenStore = {
 };
 export async function api(path, { body, ...options } = {}) {
   const token = tokenStore.get();
+  const isFormData = body instanceof FormData;
   const response = await fetch(`${BASE}${path}`, {
     ...options,
-    headers: { ...(body !== undefined ? { 'Content-Type': 'application/json' } : {}), ...(token ? { Authorization: `Bearer ${token}` } : {}), ...options.headers },
-    ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
+    headers: {
+      ...(body !== undefined && !isFormData ? { 'Content-Type': 'application/json' } : {}),
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...options.headers
+    },
+    ...(body !== undefined ? { body: isFormData ? body : JSON.stringify(body) } : {}),
   });
   const data = response.status === 204 ? null : await response.json().catch(() => null);
   if (!response.ok) {

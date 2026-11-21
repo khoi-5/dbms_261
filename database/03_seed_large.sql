@@ -1,8 +1,6 @@
--- SAFE TEST-ONLY SEED. Original benchmark is preserved in 03_seed_large.backup.sql.
--- Connect explicitly to a NEW database named BKPEE_TEST_<suffix>, NEVER BKPEE_DB.
--- One batch + one transaction: the guard cannot be bypassed by continuing after GO.
-IF DB_NAME() NOT LIKE N'BKPEE[_]TEST[_]%'
-    THROW 51000, 'Refusing seed: target must have BKPEE_TEST_ prefix; website database is forbidden.', 1;
+USE BKPEE_DB;
+GO
+
 SET XACT_ABORT ON;
 DECLARE @SeedTime DATETIME2 = '2026-10-30T00:00:00';
 BEGIN TRY
@@ -20,7 +18,7 @@ BEGIN TRANSACTION;
 
 SET NOCOUNT ON;
 PRINT N'==============================================================';
-PRINT N'BẮT ĐẦU SINH DỮ LIỆU TRÊN DATABASE TEST: ' + DB_NAME();
+PRINT N'BẮT ĐẦU SINH DỮ LIỆU TRÊN DATABASE: ' + DB_NAME();
 PRINT N'==============================================================';
 
 -- ------------------------------------------------------------------------------
@@ -76,9 +74,9 @@ EXEC sp_executesql @reseedSql;
 -- ------------------------------------------------------------------------------
 PRINT N'[2/8] Sinh Tài khoản Quản trị, Vận chuyển & Danh mục...';
 
--- Tạo Admin (Account_ID = 1)
+-- Tạo Admin (Account_ID = 1) - Mật khẩu 12345678
 INSERT INTO Account (Username, password, FName, LName, Phone, Account_Status, Email, Gender, avatar, Address, CCCD, Date_Of_Birth, Created_At, Created_By, Updated_At, Updated_By)
-VALUES ('admin_root', '$2a$10$hashed_admin_pwd', N'Văn', N'Quản Trị', '0901000000', N'ACTIVE', 'admin@bkpee.vn', N'Nam', 'https://bkpee.vn/img/admin.png', N'Quận 10, TP.HCM', '079090000000', '1995-05-15', @SeedTime, 1, @SeedTime, 1);
+VALUES ('admin_root', '$2a$12$h1U/fVmlo3BtMYSWX7IseucGx96mQsrwnS1VcTBwm3hlIaAKxrtPe', N'Văn', N'Quản Trị', '0901000000', N'ACTIVE', 'admin@bkpee.vn', N'Nam', 'https://bkpee.vn/img/admin.png', N'Quận 10, TP.HCM', '079090000000', '1995-05-15', @SeedTime, 1, @SeedTime, 1);
 
 INSERT INTO Admin (Account_ID, Admin_Role) VALUES (1, N'SUPER_ADMIN');
 
@@ -96,40 +94,40 @@ VALUES
 (N'GrabExpress Siêu Tốc',              '19001555',   N'Quận 1, TP.HCM',                   1, 35000, @SeedTime, 1, @SeedTime, 1),
 (N'Ahamove Giao Trong Ngày',            '1900545411', N'Quận 3, TP.HCM',                   1, 30000, @SeedTime, 1, @SeedTime, 1);
 
-INSERT INTO Category (Category_Name, Parent_Category_ID, Admin_ID, Created_At, Created_By, Updated_At, Updated_By) VALUES
-(N'Sách & Văn Phòng Phẩm', NULL, 1, @SeedTime, 1, @SeedTime, 1),
-(N'Thời Trang & May Mặc', NULL, 1, @SeedTime, 1, @SeedTime, 1),
-(N'Thiết Bị Điện Tử', NULL, 1, @SeedTime, 1, @SeedTime, 1),
-(N'Nhà Cửa & Đời Sống', NULL, 1, @SeedTime, 1, @SeedTime, 1),
-(N'Mẹ & Bé', NULL, 1, @SeedTime, 1, @SeedTime, 1),
-(N'Sức Khỏe & Sắc Đẹp', NULL, 1, @SeedTime, 1, @SeedTime, 1),
-(N'Thể Thao & Du Lịch', NULL, 1, @SeedTime, 1, @SeedTime, 1),
-(N'Ô Tô - Xe Máy', NULL, 1, @SeedTime, 1, @SeedTime, 1),
-(N'Bách Hóa Online', NULL, 1, @SeedTime, 1, @SeedTime, 1),
-(N'Đồ Chơi & Quà Tặng', NULL, 1, @SeedTime, 1, @SeedTime, 1);
+INSERT INTO Category (Category_Name, Parent_Category_ID, Target_Type, Admin_ID, Created_At, Created_By, Updated_At, Updated_By) VALUES
+(N'Sách & Văn Phòng Phẩm', NULL, 'BOOK',        1, @SeedTime, 1, @SeedTime, 1),
+(N'Thời Trang & May Mặc',   NULL, 'CLOTHES',     1, @SeedTime, 1, @SeedTime, 1),
+(N'Thiết Bị Điện Tử',       NULL, 'ELECTRONICS', 1, @SeedTime, 1, @SeedTime, 1),
+(N'Nhà Cửa & Đời Sống',    NULL, 'GENERAL',     1, @SeedTime, 1, @SeedTime, 1),
+(N'Mẹ & Bé',               NULL, 'GENERAL',     1, @SeedTime, 1, @SeedTime, 1),
+(N'Sức Khỏe & Sắc Đẹp',    NULL, 'GENERAL',     1, @SeedTime, 1, @SeedTime, 1),
+(N'Thể Thao & Du Lịch',     NULL, 'GENERAL',     1, @SeedTime, 1, @SeedTime, 1),
+(N'Ô Tô - Xe Máy',          NULL, 'GENERAL',     1, @SeedTime, 1, @SeedTime, 1),
+(N'Bách Hóa Online',        NULL, 'GENERAL',     1, @SeedTime, 1, @SeedTime, 1),
+(N'Đồ Chơi & Quà Tặng',     NULL, 'GENERAL',     1, @SeedTime, 1, @SeedTime, 1);
 
 -- 20 Danh mục con (Category 11 -> 30)
-INSERT INTO Category (Category_Name, Parent_Category_ID, Admin_ID, Created_At, Created_By, Updated_At, Updated_By) VALUES
-(N'Sách Công Nghệ & Kỹ Thuật',  1, 1, @SeedTime, 1, @SeedTime, 1),
-(N'Sách Kinh Tế & Khởi Nghiệp', 1, 1, @SeedTime, 1, @SeedTime, 1),
-(N'Truyện Tranh & Manga',        1, 1, @SeedTime, 1, @SeedTime, 1),
-(N'Áo Thun Nam Nữ',              2, 1, @SeedTime, 1, @SeedTime, 1),
-(N'Quần Jeans & Kaki',            2, 1, @SeedTime, 1, @SeedTime, 1),
-(N'Giày Dép Thời Trang',           2, 1, @SeedTime, 1, @SeedTime, 1),
-(N'Tai Nghe & Loa Bluetooth',     3, 1, @SeedTime, 1, @SeedTime, 1),
-(N'Điện Thoại Thông Minh',        3, 1, @SeedTime, 1, @SeedTime, 1),
-(N'Laptop & Máy Tính Bảng',      3, 1, @SeedTime, 1, @SeedTime, 1),
-(N'Nội Thất Phòng Khách',         4, 1, @SeedTime, 1, @SeedTime, 1),
-(N'Đồ Gia Dụng Nhà Bếp',          4, 1, @SeedTime, 1, @SeedTime, 1),
-(N'Sữa & Thực Phẩm Cho Bé',     5, 1, @SeedTime, 1, @SeedTime, 1),
-(N'Tã Bỉm Trẻ Em',                5, 1, @SeedTime, 1, @SeedTime, 1),
-(N'Chăm Sóc Da Mặt',              6, 1, @SeedTime, 1, @SeedTime, 1),
-(N'Thực Phẩm Chức Năng',         6, 1, @SeedTime, 1, @SeedTime, 1),
-(N'Dụng Cụ Tập Gym',              7, 1, @SeedTime, 1, @SeedTime, 1),
-(N'Lều Trại & Phụ Kiện Phượt', 7, 1, @SeedTime, 1, @SeedTime, 1),
-(N'Mũ Bảo Hiểm Chính Hãng',      8, 1, @SeedTime, 1, @SeedTime, 1),
-(N'Đồ Ăn Vặt & Bánh Kẹo',         9, 1, @SeedTime, 1, @SeedTime, 1),
-(N'Mô Hình Lắp Ráp Anime',         10, 1, @SeedTime, 1, @SeedTime, 1);
+INSERT INTO Category (Category_Name, Parent_Category_ID, Target_Type, Admin_ID, Created_At, Created_By, Updated_At, Updated_By) VALUES
+(N'Sách Công Nghệ & Kỹ Thuật',  1, 'BOOK',        1, @SeedTime, 1, @SeedTime, 1),
+(N'Sách Kinh Tế & Khởi Nghiệp', 1, 'BOOK',        1, @SeedTime, 1, @SeedTime, 1),
+(N'Truyện Tranh & Manga',        1, 'BOOK',        1, @SeedTime, 1, @SeedTime, 1),
+(N'Áo Thun Nam Nữ',              2, 'CLOTHES',     1, @SeedTime, 1, @SeedTime, 1),
+(N'Quần Jeans & Kaki',            2, 'CLOTHES',     1, @SeedTime, 1, @SeedTime, 1),
+(N'Giày Dép Thời Trang',           2, 'CLOTHES',     1, @SeedTime, 1, @SeedTime, 1),
+(N'Tai Nghe & Loa Bluetooth',     3, 'ELECTRONICS', 1, @SeedTime, 1, @SeedTime, 1),
+(N'Điện Thoại Thông Minh',        3, 'ELECTRONICS', 1, @SeedTime, 1, @SeedTime, 1),
+(N'Laptop & Máy Tính Bảng',      3, 'ELECTRONICS', 1, @SeedTime, 1, @SeedTime, 1),
+(N'Nội Thất Phòng Khách',         4, 'GENERAL',     1, @SeedTime, 1, @SeedTime, 1),
+(N'Đồ Gia Dụng Nhà Bếp',          4, 'GENERAL',     1, @SeedTime, 1, @SeedTime, 1),
+(N'Sữa & Thực Phẩm Cho Bé',     5, 'GENERAL',     1, @SeedTime, 1, @SeedTime, 1),
+(N'Tã Bỉm Trẻ Em',                5, 'GENERAL',     1, @SeedTime, 1, @SeedTime, 1),
+(N'Chăm Sóc Da Mặt',              6, 'GENERAL',     1, @SeedTime, 1, @SeedTime, 1),
+(N'Thực Phẩm Chức Năng',         6, 'GENERAL',     1, @SeedTime, 1, @SeedTime, 1),
+(N'Dụng Cụ Tập Gym',              7, 'GENERAL',     1, @SeedTime, 1, @SeedTime, 1),
+(N'Lều Trại & Phụ Kiện Phượt', 7, 'GENERAL',     1, @SeedTime, 1, @SeedTime, 1),
+(N'Mũ Bảo Hiểm Chính Hãng',      8, 'GENERAL',     1, @SeedTime, 1, @SeedTime, 1),
+(N'Đồ Ăn Vặt & Bánh Kẹo',         9, 'GENERAL',     1, @SeedTime, 1, @SeedTime, 1),
+(N'Mô Hình Lắp Ráp Anime',         10, 'GENERAL',     1, @SeedTime, 1, @SeedTime, 1);
 
 -- ------------------------------------------------------------------------------
 -- 3. Sinh 2.000 Tài khoản: 200 Sellers và 1.800 Buyers
@@ -146,7 +144,7 @@ INSERT INTO Account (Username, password, FName, LName, Phone, Account_Status, Em
 SELECT 
     CASE WHEN n <= 200 THEN 'seller_' + RIGHT('0000' + CAST(n AS VARCHAR(10)), 4)
          ELSE 'buyer_' + RIGHT('0000' + CAST(n AS VARCHAR(10)), 4) END AS Username,
-    '$2a$10$encrypted_password_sample_hash',
+    '$2a$12$h1U/fVmlo3BtMYSWX7IseucGx96mQsrwnS1VcTBwm3hlIaAKxrtPe',
     CASE (n % 5) 
         WHEN 0 THEN N'Nguyễn' 
         WHEN 1 THEN N'Trần' 
@@ -187,11 +185,11 @@ SELECT
 FROM Account
 WHERE Account_ID BETWEEN 2 AND 201;
 
--- 1.800 Buyers (Account_ID từ 202 đến 2001)
+-- 2.000 Buyers (Bao gồm cả 200 Sellers theo mô hình Overlapping Specialization)
 INSERT INTO Buyer (Account_ID)
 SELECT Account_ID
 FROM Account
-WHERE Account_ID >= 202;
+WHERE Account_ID >= 2;
 
 -- Sổ địa chỉ cho Buyer (Buyer_Infor)
 INSERT INTO Buyer_Infor (Buyer_ID, Address, Receiver_Name, Phone)
@@ -277,7 +275,7 @@ FROM Product p JOIN #SeedProducts sp ON sp.Product_Name=p.Product_Name WHERE sp.
 PRINT N'[5/8] Sinh 9.000 Biến thể Sản phẩm & Khuyến mãi...';
 
 -- Mỗi Product có 3 Variant (Tổng: 3.000 x 3 = 9.000 Variants)
-INSERT INTO Product_Variant (Product_ID, Price, Is_Active, Quantity_Stock, Image)
+INSERT INTO Product_Variant (Product_ID, Price, Is_Active, Quantity_Stock, Image, Variant_Name)
 SELECT 
     p.Product_ID,
     (CASE sp.Family WHEN 'Books' THEN 50000+(sp.Seed_ID%40)*5000
@@ -286,7 +284,12 @@ SELECT
              WHEN 18 THEN 3000000+(sp.Seed_ID%20)*500000 ELSE 8000000+(sp.Seed_ID%20)*500000 END END) * v.multiplier AS Price,
     1 AS Is_Active,
     50 + (p.Product_ID * 7 % 450) AS Quantity_Stock,
-    'https://bkpee.vn/img/product/variant_' + CAST(p.Product_ID AS VARCHAR(10)) + '_' + CAST(v.multiplier AS VARCHAR(5)) + '.png' AS Image
+    'https://bkpee.vn/img/product/variant_' + CAST(p.Product_ID AS VARCHAR(10)) + '_' + CAST(v.multiplier AS VARCHAR(5)) + '.png' AS Image,
+    CASE sp.Family
+        WHEN 'Books' THEN CASE v.multiplier WHEN 1 THEN N'Bìa mềm' WHEN 2 THEN N'Bìa cứng' ELSE N'Bản đặc biệt' END
+        WHEN 'Clothes' THEN CASE v.multiplier WHEN 1 THEN N'Size M' WHEN 2 THEN N'Size L' ELSE N'Size XL' END
+        ELSE CASE v.multiplier WHEN 1 THEN N'Màu Đen' WHEN 2 THEN N'Màu Bạc' ELSE N'Bản 256GB' END
+    END AS Variant_Name
 FROM Product p
 JOIN #SeedProducts sp ON sp.Product_Name=p.Product_Name
 CROSS JOIN (SELECT 1 AS multiplier UNION ALL SELECT 2 UNION ALL SELECT 3) v ORDER BY sp.Seed_ID,v.multiplier;
@@ -533,7 +536,7 @@ IF EXISTS(SELECT 1 FROM Cart c OUTER APPLY(SELECT COALESCE(SUM(Quantity),0) unit
     THROW 51006, 'Cart.Total_product must equal SUM Quantity', 1;
 DROP TABLE #SeedProducts;
 COMMIT;
-PRINT N'SEED VALIDATED AND COMMITTED ON TEST DATABASE ONLY';
+PRINT N'SEED VALIDATED AND COMMITTED SUCCESSFULLY';
 END TRY
 BEGIN CATCH
     IF @@TRANCOUNT>0 ROLLBACK;

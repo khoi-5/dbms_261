@@ -18,11 +18,17 @@ public class ApiErrors {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     ResponseEntity<?> validation(MethodArgumentNotValidException e) { return ResponseEntity.badRequest().body(Map.of("message","Dữ liệu không hợp lệ", "fields",e.getBindingResult().getFieldErrors().stream().map(f->f.getField()+": "+f.getDefaultMessage()).toList())); }
     @ExceptionHandler(DataIntegrityViolationException.class)
-    ResponseEntity<?> conflict() { return ResponseEntity.status(409).body(Map.of("message","Dữ liệu trùng hoặc không thỏa ràng buộc")); }
+    ResponseEntity<?> conflict(DataIntegrityViolationException e) {
+        String msg = e.getMostSpecificCause() != null ? e.getMostSpecificCause().getMessage() : e.getMessage();
+        return ResponseEntity.status(409).body(Map.of("message", "Dữ liệu không thỏa ràng buộc: " + msg));
+    }
     @ExceptionHandler({HttpMessageNotReadableException.class,MethodArgumentTypeMismatchException.class})
     ResponseEntity<?> malformed() { return ResponseEntity.badRequest().body(Map.of("message","Kiểu dữ liệu yêu cầu không hợp lệ")); }
     @ExceptionHandler(DataAccessException.class)
-    ResponseEntity<?> database() { return ResponseEntity.status(503).body(Map.of("message","Dịch vụ dữ liệu tạm thời không khả dụng. Vui lòng thử lại.")); }
+    ResponseEntity<?> database(DataAccessException e) {
+        String msg = e.getMostSpecificCause() != null ? e.getMostSpecificCause().getMessage() : e.getMessage();
+        return ResponseEntity.status(503).body(Map.of("message", "Lỗi dữ liệu: " + msg));
+    }
     @ExceptionHandler(ConcurrencyFailureException.class)
     ResponseEntity<?> concurrent() { return ResponseEntity.status(409).body(Map.of("message","Dữ liệu đang được cập nhật đồng thời. Hãy tải lại trước khi thử tiếp.")); }
 }

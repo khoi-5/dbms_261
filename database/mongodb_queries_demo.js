@@ -90,3 +90,16 @@ print(`- Chiến lược quét (Winning Plan Stage): ${explainStats.queryPlanner
 print(`- Tổng số document quét (totalDocsExamined): ${explainStats.executionStats.totalDocsExamined}`);
 print(`- Tổng số kết quả trả về (nReturned): ${explainStats.executionStats.nReturned}`);
 print(`- Thời gian thực thi (executionTimeMillis): ${explainStats.executionStats.executionTimeMillis} ms`);
+print("\n" + "=".repeat(70) + "\n");
+
+// ==============================================================================
+// QUERY 5: Lọc danh mục động theo Target_Type (Sách, Thời trang, Điện tử)
+// Mục đích lý thuyết: Minh chứng phân loại động thay vì hard-code ID
+// ==============================================================================
+print(">>> [DEMO 5] Lọc các danh mục thuộc nhóm Sách (target_type = 'BOOK'):");
+const bookCategories = currentDb.categories.find(
+  { target_type: "BOOK" },
+  { category_name: 1, target_type: 1, parent_category_id: 1, _id: 1 }
+).toArray();
+
+printjson(bookCategories);

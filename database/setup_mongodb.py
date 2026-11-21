@@ -23,6 +23,7 @@ def setup_indexes(db):
     
     db.categories.create_index([("category_name", ASCENDING)], unique=True)
     db.categories.create_index([("parent_category_id", ASCENDING)])
+    db.categories.create_index([("target_type", ASCENDING)])
     
     db.shipping_providers.create_index([("provider_name", ASCENDING)], unique=True)
     
@@ -227,12 +228,12 @@ def seed_small(db):
     
     # 2. Categories
     db.categories.insert_many([
-        { "_id": 1, "category_name": "Sách & Văn Phòng Phẩm", "parent_category_id": None, "admin_id": 1, "created_at": _now, "created_by": 1, "updated_at": _now, "updated_by": 1 },
-        { "_id": 2, "category_name": "Thời Trang & May Mặc", "parent_category_id": None, "admin_id": 1, "created_at": _now, "created_by": 1, "updated_at": _now, "updated_by": 1 },
-        { "_id": 3, "category_name": "Thiết Bị Điện Tử", "parent_category_id": None, "admin_id": 1, "created_at": _now, "created_by": 1, "updated_at": _now, "updated_by": 1 },
-        { "_id": 4, "category_name": "Sách Công Nghệ & Kỹ Thuật", "parent_category_id": 1, "admin_id": 1, "created_at": _now, "created_by": 1, "updated_at": _now, "updated_by": 1 },
-        { "_id": 5, "category_name": "Áo Thun Nam Nữ", "parent_category_id": 2, "admin_id": 1, "created_at": _now, "created_by": 1, "updated_at": _now, "updated_by": 1 },
-        { "_id": 6, "category_name": "Tai Nghe & Phụ Kiện", "parent_category_id": 3, "admin_id": 1, "created_at": _now, "created_by": 1, "updated_at": _now, "updated_by": 1 }
+        { "_id": 1, "category_name": "Sách & Văn Phòng Phẩm", "parent_category_id": None, "target_type": "BOOK", "admin_id": 1, "created_at": _now, "created_by": 1, "updated_at": _now, "updated_by": 1 },
+        { "_id": 2, "category_name": "Thời Trang & May Mặc", "parent_category_id": None, "target_type": "CLOTHES", "admin_id": 1, "created_at": _now, "created_by": 1, "updated_at": _now, "updated_by": 1 },
+        { "_id": 3, "category_name": "Thiết Bị Điện Tử", "parent_category_id": None, "target_type": "ELECTRONICS", "admin_id": 1, "created_at": _now, "created_by": 1, "updated_at": _now, "updated_by": 1 },
+        { "_id": 4, "category_name": "Sách Công Nghệ & Kỹ Thuật", "parent_category_id": 1, "target_type": "BOOK", "admin_id": 1, "created_at": _now, "created_by": 1, "updated_at": _now, "updated_by": 1 },
+        { "_id": 5, "category_name": "Áo Thun Nam Nữ", "parent_category_id": 2, "target_type": "CLOTHES", "admin_id": 1, "created_at": _now, "created_by": 1, "updated_at": _now, "updated_by": 1 },
+        { "_id": 6, "category_name": "Tai Nghe & Phụ Kiện", "parent_category_id": 3, "target_type": "ELECTRONICS", "admin_id": 1, "created_at": _now, "created_by": 1, "updated_at": _now, "updated_by": 1 }
     ])
     
     # 3. Shipping Providers
@@ -558,23 +559,46 @@ def seed_large(db):
     # 2. Categories (30 danh mục)
     print("  -> [2/9] Sinh 30 danh mục (Cây phân cấp 2 tầng)...")
     categories = []
-    parent_names = [
-        "Sách & Văn Phòng Phẩm", "Thời Trang & May Mặc", "Thiết Bị Điện Tử", "Nhà Cửa & Đời Sống",
-        "Mẹ & Bé", "Sức Khỏe & Sắc Đẹp", "Thể Thao & Du Lịch", "Ô Tô - Xe Máy", "Bách Hóa Online", "Đồ Chơi & Quà Tặng"
+    parent_data = [
+        ("Sách & Văn Phòng Phẩm", "BOOK"),
+        ("Thời Trang & May Mặc", "CLOTHES"),
+        ("Thiết Bị Điện Tử", "ELECTRONICS"),
+        ("Nhà Cửa & Đời Sống", "GENERAL"),
+        ("Mẹ & Bé", "GENERAL"),
+        ("Sức Khỏe & Sắc Đẹp", "GENERAL"),
+        ("Thể Thao & Du Lịch", "GENERAL"),
+        ("Ô Tô - Xe Máy", "GENERAL"),
+        ("Bách Hóa Online", "GENERAL"),
+        ("Đồ Chơi & Quà Tặng", "GENERAL")
     ]
-    for i, name in enumerate(parent_names, 1):
-        categories.append({ "_id": i, "category_name": name, "parent_category_id": None, "admin_id": 1, "created_at": now, "created_by": 1, "updated_at": now, "updated_by": 1 })
+    for i, (name, target_type) in enumerate(parent_data, 1):
+        categories.append({ "_id": i, "category_name": name, "parent_category_id": None, "target_type": target_type, "admin_id": 1, "created_at": now, "created_by": 1, "updated_at": now, "updated_by": 1 })
     
-    child_names = [
-        "Sách Công Nghệ & Kỹ Thuật", "Sách Kinh Tế & Khởi Nghiệp", "Truyện Tranh & Manga", "Áo Thun Nam Nữ",
-        "Quần Jeans & Kaki", "Giày Dép Thời Trang", "Tai Nghe & Loa Bluetooth", "Điện Thoại Thông Minh",
-        "Laptop & Máy Tính Bảng", "Nội Thất Phòng Khách", "Đồ Gia Dụng Nhà Bếp", "Sữa & Thực Phẩm Cho Bé",
-        "Tã Bỉm Trẻ Em", "Chăm Sóc Da Mặt", "Thực Phẩm Chức Năng", "Dụng Cụ Tập Gym", "Lều Trại & Phụ Kiện Phượt",
-        "Mũ Bảo Hiểm Chính Hãng", "Đồ Ăn Vặt & Bánh Kẹo", "Mô Hình Lắp Ráp Anime"
+    child_data = [
+        ("Sách Công Nghệ & Kỹ Thuật", "BOOK"),
+        ("Sách Kinh Tế & Khởi Nghiệp", "BOOK"),
+        ("Truyện Tranh & Manga", "BOOK"),
+        ("Áo Thun Nam Nữ", "CLOTHES"),
+        ("Quần Jeans & Kaki", "CLOTHES"),
+        ("Giày Dép Thời Trang", "CLOTHES"),
+        ("Tai Nghe & Loa Bluetooth", "ELECTRONICS"),
+        ("Điện Thoại Thông Minh", "ELECTRONICS"),
+        ("Laptop & Máy Tính Bảng", "ELECTRONICS"),
+        ("Nội Thất Phòng Khách", "GENERAL"),
+        ("Đồ Gia Dụng Nhà Bếp", "GENERAL"),
+        ("Sữa & Thực Phẩm Cho Bé", "GENERAL"),
+        ("Tã Bỉm Trẻ Em", "GENERAL"),
+        ("Chăm Sóc Da Mặt", "GENERAL"),
+        ("Thực Phẩm Chức Năng", "GENERAL"),
+        ("Dụng Cụ Tập Gym", "GENERAL"),
+        ("Lều Trại & Phụ Kiện Phượt", "GENERAL"),
+        ("Mũ Bảo Hiểm Chính Hãng", "GENERAL"),
+        ("Đồ Ăn Vặt & Bánh Kẹo", "GENERAL"),
+        ("Mô Hình Lắp Ráp Anime", "GENERAL")
     ]
-    for i, name in enumerate(child_names, 11):
+    for i, (name, target_type) in enumerate(child_data, 11):
         parent_id = ((i - 11) % 10) + 1
-        categories.append({ "_id": i, "category_name": name, "parent_category_id": parent_id, "admin_id": 1, "created_at": now, "created_by": 1, "updated_at": now, "updated_by": 1 })
+        categories.append({ "_id": i, "category_name": name, "parent_category_id": parent_id, "target_type": target_type, "admin_id": 1, "created_at": now, "created_by": 1, "updated_at": now, "updated_by": 1 })
     db.categories.insert_many(categories, ordered=False)
     
     # 3. Shipping Providers (10 đơn vị)
@@ -599,25 +623,35 @@ def seed_large(db):
     for n in range(1, 3001):
         p_type = ["BOOK", "CLOTHES", "ELECTRONICS"][n % 3]
         seller_id = 2 + (n % 200)
-        cat_id = 11 + (n % 20)
         
         attrs = {}
         if p_type == "BOOK":
+            cat_id = 11 + (n // 3) % 3
             attrs = {
                 "publisher": f"NXB Đại Học Quốc Gia - Cơ sở {(n % 5 + 1)}",
                 "authors": [f"GS. Tác Giả {(n % 50 + 1)}", f"ThS. Đồng Tác Giả {(n % 30 + 1)}"]
             }
+            variants = [
+                { "variant_id": (n - 1) * 3 + 1, "variant_name": "Bìa Mềm", "price": 50000 + (n * 17 % 200) * 10000, "quantity_stock": 100, "is_active": True, "image": f"https://bkpee.vn/img/p_{n}_1.png" },
+                { "variant_id": (n - 1) * 3 + 2, "variant_name": "Bìa Cứng", "price": int((50000 + (n * 17 % 200) * 10000) * 1.5), "quantity_stock": 50, "is_active": True, "image": f"https://bkpee.vn/img/p_{n}_2.png" },
+                { "variant_id": (n - 1) * 3 + 3, "variant_name": "Bản Đặc Biệt", "price": int((50000 + (n * 17 % 200) * 10000) * 2.0), "quantity_stock": 30, "is_active": True, "image": f"https://bkpee.vn/img/p_{n}_3.png" }
+            ]
         elif p_type == "CLOTHES":
+            cat_id = 14 + (n // 3) % 3
             attrs = { "material": ["100% Cotton Hữu Cơ", "Vải Đũi Thoáng Mát", "Polyester Siêu Nhẹ"][n % 3] }
+            variants = [
+                { "variant_id": (n - 1) * 3 + 1, "variant_name": "Size M", "price": 100000 + (n * 17 % 200) * 10000, "quantity_stock": 100, "is_active": True, "image": f"https://bkpee.vn/img/p_{n}_1.png" },
+                { "variant_id": (n - 1) * 3 + 2, "variant_name": "Size L", "price": int((100000 + (n * 17 % 200) * 10000) * 1.5), "quantity_stock": 50, "is_active": True, "image": f"https://bkpee.vn/img/p_{n}_2.png" },
+                { "variant_id": (n - 1) * 3 + 3, "variant_name": "Size XL", "price": int((100000 + (n * 17 % 200) * 10000) * 2.0), "quantity_stock": 30, "is_active": True, "image": f"https://bkpee.vn/img/p_{n}_3.png" }
+            ]
         else:
+            cat_id = 17 + (n // 3) % 3
             attrs = { "warranty_id": f"WARRANTY-{n:06d}", "warranty_time": f"{(n % 3 + 1) * 12} tháng" }
-            
-        base_price = 50000 + (n * 17 % 200) * 10000
-        variants = [
-            { "variant_id": (n - 1) * 3 + 1, "variant_name": "Phiên bản Standard", "price": base_price, "quantity_stock": 100, "is_active": True, "image": f"https://bkpee.vn/img/p_{n}_1.png" },
-            { "variant_id": (n - 1) * 3 + 2, "variant_name": "Phiên bản Plus", "price": base_price * 1.5, "quantity_stock": 50, "is_active": True, "image": f"https://bkpee.vn/img/p_{n}_2.png" },
-            { "variant_id": (n - 1) * 3 + 3, "variant_name": "Phiên bản Premium", "price": base_price * 2.0, "quantity_stock": 30, "is_active": True, "image": f"https://bkpee.vn/img/p_{n}_3.png" }
-        ]
+            variants = [
+                { "variant_id": (n - 1) * 3 + 1, "variant_name": "Bản Tiêu Chuẩn", "price": 500000 + (n * 17 % 200) * 50000, "quantity_stock": 100, "is_active": True, "image": f"https://bkpee.vn/img/p_{n}_1.png" },
+                { "variant_id": (n - 1) * 3 + 2, "variant_name": "Bản Nâng Cấp 256GB", "price": int((500000 + (n * 17 % 200) * 50000) * 1.5), "quantity_stock": 50, "is_active": True, "image": f"https://bkpee.vn/img/p_{n}_2.png" },
+                { "variant_id": (n - 1) * 3 + 3, "variant_name": "Bản Cao Cấp 512GB", "price": int((500000 + (n * 17 % 200) * 50000) * 2.0), "quantity_stock": 30, "is_active": True, "image": f"https://bkpee.vn/img/p_{n}_3.png" }
+            ]
         
         prod_created = now - timedelta(days=n % 300)
         products.append({

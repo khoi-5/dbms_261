@@ -43,6 +43,7 @@ currentDb.accounts.createIndex({ roles: 1 });
 // 2.2 Categories indexes
 currentDb.categories.createIndex({ category_name: 1 }, { unique: true });
 currentDb.categories.createIndex({ parent_category_id: 1 });
+currentDb.categories.createIndex({ target_type: 1 });
 
 // 2.3 Shipping Providers indexes
 currentDb.shipping_providers.createIndex({ provider_name: 1 }, { unique: true });
@@ -223,12 +224,12 @@ currentDb.accounts.insertMany([
 
 // 3.2 Categories
 currentDb.categories.insertMany([
-  { _id: 1, category_name: "Sách & Văn Phòng Phẩm", parent_category_id: null, admin_id: 1 },
-  { _id: 2, category_name: "Thời Trang & May Mặc", parent_category_id: null, admin_id: 1 },
-  { _id: 3, category_name: "Thiết Bị Điện Tử", parent_category_id: null, admin_id: 1 },
-  { _id: 4, category_name: "Sách Công Nghệ & Kỹ Thuật", parent_category_id: 1, admin_id: 1 },
-  { _id: 5, category_name: "Áo Thun Nam Nữ", parent_category_id: 2, admin_id: 1 },
-  { _id: 6, category_name: "Tai Nghe & Phụ Kiện", parent_category_id: 3, admin_id: 1 }
+  { _id: 1, category_name: "Sách & Văn Phòng Phẩm", parent_category_id: null, target_type: "BOOK", admin_id: 1 },
+  { _id: 2, category_name: "Thời Trang & May Mặc", parent_category_id: null, target_type: "CLOTHES", admin_id: 1 },
+  { _id: 3, category_name: "Thiết Bị Điện Tử", parent_category_id: null, target_type: "ELECTRONICS", admin_id: 1 },
+  { _id: 4, category_name: "Sách Công Nghệ & Kỹ Thuật", parent_category_id: 1, target_type: "BOOK", admin_id: 1 },
+  { _id: 5, category_name: "Áo Thun Nam Nữ", parent_category_id: 2, target_type: "CLOTHES", admin_id: 1 },
+  { _id: 6, category_name: "Tai Nghe & Phụ Kiện", parent_category_id: 3, target_type: "ELECTRONICS", admin_id: 1 }
 ]);
 
 // 3.3 Shipping Providers

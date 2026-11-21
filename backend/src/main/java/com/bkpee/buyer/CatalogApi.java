@@ -12,22 +12,44 @@ import static com.bkpee.buyer.CatalogModels.*;
 public class CatalogApi {
     private final CatalogJdbcRepository catalog;
     private final CatalogSettings settings;
+
     public CatalogApi(CatalogJdbcRepository catalog, CatalogSettings settings) {
-        this.catalog = catalog; this.settings = settings;
+        this.catalog = catalog;
+        this.settings = settings;
     }
-    @GetMapping("/categories") public List<Category> categories() { return catalog.categories(); }
+
+    @GetMapping("/categories")
+    public List<Category> categories() {
+        return catalog.categories();
+    }
+
     @GetMapping("/products")
-    public Page products(@RequestParam(defaultValue="") String keyword,
-                         @RequestParam(required=false) Integer categoryId,
-                         @RequestParam(required=false) BigDecimal minPrice,
-                         @RequestParam(required=false) BigDecimal maxPrice,
-                         @RequestParam(defaultValue="0") int page,
-                         @RequestParam(required=false) Integer size) {
-        return catalog.search(Query.of(keyword, categoryId, minPrice, maxPrice, page, size, settings));
+    public Page products(
+            @RequestParam(defaultValue="") String keyword,
+            @RequestParam(required=false) Integer categoryId,
+            @RequestParam(required=false) String format,
+            @RequestParam(required=false) BigDecimal minPrice,
+            @RequestParam(required=false) BigDecimal maxPrice,
+            @RequestParam(defaultValue="0") int page,
+            @RequestParam(required=false) Integer size) {
+        return catalog.search(Query.of(keyword, categoryId, format, minPrice, maxPrice, page, size, settings));
     }
-    @GetMapping("/products/{id}/variants") public List<Variant> variants(@PathVariable int id) {
+
+    @GetMapping("/products/{id}")
+    public ProductDetail productDetail(@PathVariable int id) {
+        var detail = catalog.findDetail(id);
+        if (detail == null) {
+            throw new ResponseStatusException(NOT_FOUND, "Không tìm thấy sản phẩm");
+        }
+        return detail;
+    }
+
+    @GetMapping("/products/{id}/variants")
+    public List<Variant> variants(@PathVariable int id) {
         var rows = catalog.variants(id);
-        if (rows.isEmpty()) throw new ResponseStatusException(NOT_FOUND, "Sản phẩm không còn biến thể được phép bán");
+        if (rows.isEmpty()) {
+            throw new ResponseStatusException(NOT_FOUND, "Sản phẩm không còn biến thể được phép bán");
+        }
         return rows;
     }
 }

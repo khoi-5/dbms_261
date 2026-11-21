@@ -143,13 +143,15 @@ CREATE TABLE Category (
     Category_ID INT IDENTITY(1,1) PRIMARY KEY,
     Category_Name NVARCHAR(100) NOT NULL UNIQUE,
     Parent_Category_ID INT NULL,
+    Target_Type VARCHAR(30) NOT NULL DEFAULT 'GENERAL',
     Admin_ID INT NULL,
     Created_At DATETIME2 NOT NULL DEFAULT GETDATE(),
     Created_By INT NULL,
     Updated_At DATETIME2 NOT NULL DEFAULT GETDATE(),
     Updated_By INT NULL,
     CONSTRAINT FK_Category_Parent FOREIGN KEY (Parent_Category_ID) REFERENCES Category(Category_ID),
-    CONSTRAINT FK_Category_Admin FOREIGN KEY (Admin_ID) REFERENCES Admin(Account_ID)
+    CONSTRAINT FK_Category_Admin FOREIGN KEY (Admin_ID) REFERENCES Admin(Account_ID),
+    CONSTRAINT CK_Category_TargetType CHECK (Target_Type IN ('BOOK', 'CLOTHES', 'ELECTRONICS', 'GENERAL'))
 );
 GO
 
@@ -211,6 +213,7 @@ CREATE TABLE Product_Variant (
     Price DECIMAL(18,2) NOT NULL,
     Is_Active BIT NOT NULL DEFAULT 1,
     Quantity_Stock INT NOT NULL DEFAULT 0,
+    Variant_Name NVARCHAR(100) NULL,
     Image NVARCHAR(500) NULL,
     CONSTRAINT FK_Variant_Product FOREIGN KEY (Product_ID) REFERENCES Product(Product_ID) ON DELETE CASCADE,
     CONSTRAINT CK_Variant_Price CHECK (Price >= 0),

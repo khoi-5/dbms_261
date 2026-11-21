@@ -89,6 +89,7 @@ Trong MongoDB (NoSQL Document Store), chúng ta áp dụng mô hình **Data Mode
   "_id": 4,
   "category_name": "Sách Công Nghệ & Kỹ Thuật",
   "parent_category_id": 1,
+  "target_type": "BOOK",
   "ancestors": [
     { "_id": 1, "name": "Sách & Văn Phòng Phẩm" }
   ],
