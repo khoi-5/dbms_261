@@ -11,17 +11,24 @@ export default function BuyerLayout() {
   const [showBecomeSellerModal, setShowBecomeSellerModal] = useState(false);
 
   useEffect(() => {
-    if (!user) {
-      setCartCount(0);
-      return;
-    }
     let alive = true;
-    api('/buyer/cart')
-      .then(cart => {
-        if (alive && cart?.totalQuantity) setCartCount(cart.totalQuantity);
-      })
-      .catch(() => { });
-    return () => { alive = false; };
+    const syncCart = () => {
+      if (!user) {
+        if (alive) setCartCount(0);
+        return;
+      }
+      api('/buyer/cart')
+        .then(cart => {
+          if (alive) setCartCount(cart?.totalQuantity || 0);
+        })
+        .catch(() => { });
+    };
+    syncCart();
+    window.addEventListener('cart-updated', syncCart);
+    return () => {
+      alive = false;
+      window.removeEventListener('cart-updated', syncCart);
+    };
   }, [user]);
 
   const navItemClass = ({ isActive }) =>
@@ -243,6 +250,29 @@ export default function BuyerLayout() {
               <polyline points="10 9 9 9 8 9"></polyline>
             </svg>
             <span>Đơn hàng</span>
+          </NavLink>
+
+          <NavLink
+            to="/promotions"
+            style={({ isActive }) => ({
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              padding: '10px 14px',
+              borderRadius: '8px',
+              textDecoration: 'none',
+              fontSize: '14px',
+              fontWeight: isActive ? '600' : '500',
+              color: isActive ? '#2563eb' : '#475569',
+              backgroundColor: isActive ? '#eff6ff' : 'transparent',
+              transition: 'all 0.15s ease'
+            })}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+              <line x1="7" y1="7" x2="7.01" y2="7"></line>
+            </svg>
+            <span>Khuyến mãi</span>
           </NavLink>
 
           <NavLink
