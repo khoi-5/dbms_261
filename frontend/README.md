@@ -42,8 +42,17 @@ cd ..\backend
 python scripts/check_connection.py
 ```
 
-See [implementation and demo notes](../IMPLEMENTATION_F01_F08_F09_F10.md).
-See [controlled upgrade report](../UPGRADE_F01_F08_F09_F10.md) for configurable
-pagination, quantity selection, profile/password contracts and isolated SQL tests.
+Catalog pagination defaults to 12 items, with a maximum of 48. Frontend overrides
+`VITE_CATALOG_PAGE_SIZE` and `VITE_CATALOG_MAX_PAGE_SIZE` are defined in
+[catalog configuration](src/config/catalog.js); backend overrides
+`CATALOG_DEFAULT_PAGE_SIZE` and `CATALOG_MAX_PAGE_SIZE` are defined in
+[application configuration](../backend/src/main/resources/application.yml).
+Keep the frontend and backend limits compatible. See the current
+[catalog API](../backend/src/main/java/com/bkpee/buyer/CatalogApi.java),
+[cart API](../backend/src/main/java/com/bkpee/buyer/CartApi.java),
+[profile API](../backend/src/main/java/com/bkpee/auth/BuyerProfileApi.java), and
+[catalog tests](src/config/catalog.test.js) for their contracts and validation.
+SQL write integration tests require a separate `BKPEE_TEST_` database; see
+[BuyerSqlIntegrationTest](../backend/src/test/java/com/bkpee/integration/BuyerSqlIntegrationTest.java).
 The smoke/demo scripts and opt-in SQL integration tests create QA records;
 do not run those as a read-only connection diagnostic.

@@ -73,7 +73,7 @@ ownership checks when business endpoints are implemented.
 
 `/api/health` is permitted by security, but no health controller currently
 exists. Auth, products, categories and Buyer cart now have implementations;
-see `../IMPLEMENTATION_F01_F08_F09_F10.md` for their contracts.
+see [AuthApi](src/main/java/com/bkpee/auth/AuthApi.java), [CatalogApi](src/main/java/com/bkpee/buyer/CatalogApi.java), and [CartApi](src/main/java/com/bkpee/buyer/CartApi.java) for their current contracts.
 JWT configuration tests run without a database; a passing test is not proof of
 a JDBC connection or a successful full application startup.
 

@@ -3,3 +3,4 @@
 !.env.example
 target/
 *.log
+/local_docs/
