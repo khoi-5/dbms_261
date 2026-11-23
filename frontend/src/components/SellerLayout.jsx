@@ -1,4 +1,4 @@
-import React from 'react';
+import { startTransition } from 'react';
 import { NavLink, Outlet, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
 
@@ -201,7 +201,10 @@ export default function SellerLayout() {
 
         <div style={{ borderTop: '1px solid #e2e8f0', paddingTop: '16px' }}>
           <button 
-            onClick={() => { logout(); navigate('/login'); }}
+            onClick={() => startTransition(() => {
+              logout();
+              navigate('/login', { replace: true });
+            })}
             style={{
               width: '100%',
               display: 'flex',

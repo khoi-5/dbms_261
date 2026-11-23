@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, matchPath, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
 import PasswordField from '../components/PasswordField';
 
@@ -37,16 +37,18 @@ export default function AuthPage({ register = false }) {
         endpoint = roleType === 'SELLER' ? 'register-seller' : 'register';
       }
 
-      const user = await authenticate(endpoint, body);
+      const { roles } = await authenticate(endpoint, body);
       const requested = location.state?.from;
+      const returnPath = typeof requested === 'string' && requested.startsWith('/') &&
+        !requested.startsWith('//') && !requested.includes('\\') ? requested : null;
 
-      if (requested?.startsWith('/') && !requested.startsWith('//')) {
-        navigate(requested, { replace: true });
-      } else if (user.roles.includes('SELLER')) {
-        navigate('/seller/products', { replace: true });
-      } else {
-        navigate('/products', { replace: true });
-      }
+      const requiredRole = returnPath && matchPath('/seller/*', returnPath) ? 'SELLER' : 'BUYER';
+      const canResume = returnPath && (matchPath('/products', returnPath) || roles.includes(requiredRole));
+      const preferSeller = roles.includes('SELLER') &&
+        (!roles.includes('BUYER') || (register && roleType === 'SELLER'));
+      const home = preferSeller ? '/seller/products' : '/products';
+
+      navigate(canResume ? returnPath : home, { replace: true });
     } catch (e) {
       setError(e.message || 'Thao tác không thành công.');
     } finally {
