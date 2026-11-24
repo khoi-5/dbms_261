@@ -19,42 +19,39 @@ public class OrderJdbcRepository {
     public OrderJdbcRepository(JdbcTemplate db) { this.db=db; }
 
     public void requireSchema() {
-        record MissingColumn(int step, String database, String column) {}
+        record MissingColumn(String database, String column) {}
 
         var missing = db.query("""
-            SELECT DB_NAME() AS Database_Name, r.Migration_Step,
+            SELECT DB_NAME() AS Database_Name,
                    CONCAT(r.Table_Name, '.', r.Column_Name) AS Missing_Column
             FROM (VALUES
-                (1, 'dbo.[Order]', 'Checkout_Key'),
-                (1, 'dbo.[Order]', 'Checkout_Request_Hash'),
-                (1, 'dbo.[Order]', 'Receiver_Name'),
-                (1, 'dbo.[Order]', 'Receiver_Phone'),
-                (1, 'dbo.Shop_Order', 'Stock_Deducted'),
-                (1, 'dbo.Shop_Order_Item', 'Product_Name_Snapshot'),
-                (1, 'dbo.Payment_Information', 'Paid_At'),
-                (1, 'dbo.Payment_Information', 'Is_Simulated'),
-                (2, 'dbo.Shop_Order', 'Buyer_Received_At'),
-                (3, 'dbo.Product_Variant', 'Variant_Name'),
-                (4, 'dbo.Shop_Order_Item', 'Variant_Name_Snapshot')
-            ) AS r(Migration_Step, Table_Name, Column_Name)
+                ('dbo.[Order]', 'Checkout_Key'),
+                ('dbo.[Order]', 'Checkout_Request_Hash'),
+                ('dbo.[Order]', 'Receiver_Name'),
+                ('dbo.[Order]', 'Receiver_Phone'),
+                ('dbo.Shop_Order', 'Stock_Deducted'),
+                ('dbo.Shop_Order_Item', 'Product_Name_Snapshot'),
+                ('dbo.Payment_Information', 'Paid_At'),
+                ('dbo.Payment_Information', 'Is_Simulated'),
+                ('dbo.Shop_Order', 'Buyer_Received_At'),
+                ('dbo.Product_Variant', 'Variant_Name'),
+                ('dbo.Shop_Order_Item', 'Variant_Name_Snapshot'),
+                ('dbo.Shop_Order', 'Promotion_ID_Snapshot'),
+                ('dbo.Shop_Order', 'Discount_Amount')
+            ) AS r(Table_Name, Column_Name)
             WHERE COL_LENGTH(r.Table_Name, r.Column_Name) IS NULL
-            ORDER BY r.Migration_Step, r.Table_Name, r.Column_Name
-            """, (rs, rowNum) -> new MissingColumn(rs.getInt("Migration_Step"),
-                    rs.getString("Database_Name"), rs.getString("Missing_Column")));
+            ORDER BY r.Table_Name, r.Column_Name
+            """, (rs, rowNum) -> new MissingColumn(rs.getString("Database_Name"), rs.getString("Missing_Column")));
 
         if (missing.isEmpty()) return;
 
-        var first = missing.getFirst();
-        String action = switch (first.step()) {
-            case 1 -> "Chạy database/order_migration.sql trên database này.";
-            case 2 -> "Chạy database/buyer_receipt.sql trên database này.";
-            case 3 -> "Bổ sung Product_Variant.Variant_Name theo schema của nhóm.";
-            case 4 -> "Chạy database/order_item_variant_snapshot.sql trên database này.";
-            default -> throw new IllegalStateException("Unexpected order schema step: " + first.step());
-        };
-        String columns = String.join(", ", missing.stream().map(MissingColumn::column).toList());
+        var columns = missing.stream().map(MissingColumn::column).toList();
+        String action = columns.contains("dbo.Product_Variant.Variant_Name")
+                ? "Bổ sung Product_Variant.Variant_Name theo schema nhóm, rồi chạy database/order_migration.sql."
+                : "Chọn database này rồi chạy database/order_migration.sql.";
         throw new ResponseStatusException(SERVICE_UNAVAILABLE,
-                "CSDL " + first.database() + " chưa đủ schema đơn hàng. Thiếu " + columns + ". " + action);
+                "CSDL " + missing.getFirst().database() + " chưa đủ schema đơn hàng. Thiếu "
+                        + String.join(", ", columns) + ". " + action);
     }
 
     public boolean isTestDatabase() {
@@ -83,6 +80,11 @@ public class OrderJdbcRepository {
     public Integer cartId(int buyerId) {
         var ids=db.queryForList("SELECT Cart_ID FROM Cart WHERE Buyer_ID=?",Integer.class,buyerId);
         return ids.isEmpty()?null:ids.getFirst();
+    }
+    public int promotionSeller(int promotionId) {
+        var sellers=db.queryForList("SELECT Seller_ID FROM Promotion WHERE Promotion_ID=?",Integer.class,promotionId);
+        if(sellers.isEmpty()) throw OrderRules.conflict("Khuyến mãi không còn áp dụng");
+        return sellers.getFirst();
     }
     private static CartLine cartLine(ResultSet rs, int quantity) throws SQLException {
         return new CartLine(rs.getInt("Variant_ID"),rs.getInt("Product_ID"),rs.getInt("Seller_ID"),
@@ -134,11 +136,13 @@ public class OrderJdbcRepository {
             ""","Order_ID",buyer,total,r.deliveryAddress(),r.receiverName(),r.receiverPhone(),
                 r.requestKey(),hash,buyer,buyer);
     }
-    public int insertShop(int order,int seller,ShippingProvider provider) {
+    public int insertShop(int order,int seller,ShippingProvider provider,AppliedPromotion promotion) {
         return insertId("""
-            INSERT INTO Shop_Order(Order_ID,Seller_ID,Provider_ID,Shipping_Fee,Delivery_Status,Stock_Deducted)
-            VALUES (?,?,?,?,N'PENDING',0)
-            ""","Shop_Order_ID",order,seller,provider.id(),provider.fee());
+            INSERT INTO Shop_Order(Order_ID,Seller_ID,Provider_ID,Shipping_Fee,Delivery_Status,Stock_Deducted,
+                Promotion_ID_Snapshot,Discount_Amount)
+            VALUES (?,?,?,?,N'PENDING',0,?,?)
+            ""","Shop_Order_ID",order,seller,provider.id(),provider.fee(),promotion==null?null:promotion.id(),
+                promotion==null?BigDecimal.ZERO:promotion.discountAmount());
     }
     public void insertItem(int shop,CartLine line) {
         db.update("""
@@ -230,7 +234,8 @@ public class OrderJdbcRepository {
         return headers.stream().map(h->{
             var children=shops.stream().filter(s->s.orderId()==h.id()).toList();
             var payable=children.stream().map(ShopOrderView::payableTotal).reduce(BigDecimal.ZERO,BigDecimal::add);
-            return new OrderView(h.id(),h.at(),h.total(),payable,h.name(),h.phone(),h.address(),h.payment(),children);
+            var discount=children.stream().map(ShopOrderView::discountAmount).reduce(BigDecimal.ZERO,BigDecimal::add);
+            return new OrderView(h.id(),h.at(),h.total(),payable,discount,h.name(),h.phone(),h.address(),h.payment(),children);
         }).toList();
     }
     public OrderView buyerOrder(int buyer,int order) {
@@ -249,7 +254,8 @@ public class OrderJdbcRepository {
     }
     private record ShopRow(int id,int order,LocalDateTime at,int seller,String shop,int buyerId,String buyer,String username,
                            String receiver,String phone,String address,int provider,String providerName,
-                           String tracking,String status,BigDecimal fee,boolean deducted,PaymentView payment,
+                           String tracking,String status,BigDecimal fee,Integer promotionId,BigDecimal discount,
+                           boolean deducted,PaymentView payment,
                            LocalDateTime shipped,LocalDateTime delivered,LocalDateTime received) {}
     private record ItemRow(int shop,LineItem item) {}
     private List<ShopOrderView> shopViews(String condition,Object[] args) {
@@ -267,7 +273,9 @@ public class OrderJdbcRepository {
                 rs.getString("Shop_Name"),rs.getInt("Buyer_ID"),rs.getString("Buyer_Name"),rs.getString("Buyer_Username"),
                 rs.getString("Receiver_Name"),rs.getString("Receiver_Phone"),
                 rs.getString("Delivery_Address"),rs.getInt("Provider_ID"),rs.getString("Provider_Name"),rs.getString("Tracking_Number"),
-                rs.getString("Delivery_Status"),rs.getBigDecimal("Shipping_Fee"),rs.getBoolean("Stock_Deducted"),payment(rs),
+                rs.getString("Delivery_Status"),rs.getBigDecimal("Shipping_Fee"),
+                rs.getObject("Promotion_ID_Snapshot",Integer.class),rs.getBigDecimal("Discount_Amount"),
+                rs.getBoolean("Stock_Deducted"),payment(rs),
                 time(rs,"Shipped_At"),time(rs,"Delivered_At"),time(rs,"Buyer_Received_At")),args);
         if(rows.isEmpty()) return List.of();
         var shopIds=rows.stream().map(ShopRow::id).toList();
@@ -293,10 +301,10 @@ public class OrderJdbcRepository {
         return rows.stream().map(r->{
             var lines=List.copyOf(grouped.getOrDefault(r.id(),List.of()));
             BigDecimal subtotal=lines.stream().map(LineItem::subtotal).reduce(BigDecimal.ZERO,BigDecimal::add);
-            BigDecimal total=subtotal.add(r.fee());
+            BigDecimal total=subtotal.subtract(r.discount()).add(r.fee());
             return new ShopOrderView(r.id(),r.order(),r.at(),r.seller(),r.shop(),r.buyerId(),r.buyer(),r.username(),
                     r.receiver(),r.phone(),r.address(),
-                    r.provider(),r.providerName(),r.tracking(),r.status(),r.fee(),subtotal,total,
+                    r.provider(),r.providerName(),r.tracking(),r.status(),r.fee(),subtotal,r.promotionId(),r.discount(),total,
                     "CANCELLED".equals(r.status())?BigDecimal.ZERO:total,r.deducted(),r.payment(),r.shipped(),r.delivered(),r.received(),
                     lines,OrderRules.transitions(r.status(),r.deducted(),r.payment()),
                     OrderRules.canCancel(r.status(),r.deducted(),r.payment()),

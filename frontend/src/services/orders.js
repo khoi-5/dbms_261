@@ -13,8 +13,18 @@ const methodLabels = {
 export const statusLabel = status => deliveryStatuses.find(([code]) => code === status)?.[1] || status;
 export const paymentLabel = status => paymentLabels[status] || status;
 export const methodLabel = method => methodLabels[method] || method;
-export const orderMoney = value => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value ?? 0);
+export const orderMoney = value => new Intl.NumberFormat('vi-VN', {
+  style: 'currency', currency: 'VND', maximumFractionDigits: 2,
+}).format(value ?? 0);
 export const orderDate = value => value ? value.replace('T', ' ').slice(0, 19) : '—';
+const promotionKey = 'checkout.promotionId';
+export function readCheckoutPromotion() {
+  const id = Number(sessionStorage.getItem(promotionKey));
+  return Number.isInteger(id) && id > 0 && id <= 2147483647 ? id : null;
+}
+export function clearCheckoutPromotion(id) {
+  if (id === readCheckoutPromotion()) sessionStorage.removeItem(promotionKey);
+}
 const intentKey = accountId => 'bkpee.checkout.intent.' + accountId;
 export function readCheckoutIntent(accountId) {
   try {

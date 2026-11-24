@@ -1,6 +1,3 @@
-USE BKPEE_DB;
-GO
-
 SET NOCOUNT ON;
 
 IF @@TRANCOUNT <> 0
@@ -8,8 +5,11 @@ BEGIN
     RAISERROR(N'Use a connection with no open transaction.', 16, 1);
     RETURN;
 END;
+
+SET IMPLICIT_TRANSACTIONS OFF;
+
 IF DB_NAME() <> N'BKPEE_DB'
-    THROW 51000, 'Select the local BKPEE_DB database.', 1;
+    THROW 51000, 'Select BKPEE_DB in SSMS and run the entire file.', 1;
 IF COL_LENGTH(N'dbo.Shop_Order', N'Stock_Deducted') IS NULL
    OR COL_LENGTH(N'dbo.Payment_Information', N'Is_Simulated') IS NULL
     THROW 51002, 'Run order_migration.sql first.', 1;

@@ -2,10 +2,18 @@ package com.bkpee.orders;
 
 import com.bkpee.auth.AccountAuthService;
 import com.bkpee.buyer.BuyerCartService;
+import com.bkpee.orders.OrderModels.CancelRequest;
+import com.bkpee.orders.OrderModels.CheckoutPreview;
+import com.bkpee.orders.OrderModels.CheckoutRequest;
+import com.bkpee.orders.OrderModels.CheckoutResult;
+import com.bkpee.orders.OrderModels.ConfirmReceiptRequest;
+import com.bkpee.orders.OrderModels.StatusRequest;
 import com.bkpee.security.JwtService;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.net.http.*;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.*;
@@ -22,6 +30,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.web.server.ResponseStatusException;
+import tools.jackson.databind.json.JsonMapper;
 import static org.junit.jupiter.api.Assertions.*;
 import static com.bkpee.orders.OrderModels.*;
 
@@ -33,6 +42,7 @@ import static com.bkpee.orders.OrderModels.*;
 })
 @Import(OrdersSqlIntegrationTest.FailureConfig.class)
 class OrdersSqlIntegrationTest {
+    private static final JsonMapper JSON = new JsonMapper();
     @Autowired JdbcTemplate db;
     @Autowired AccountAuthService auth;
     @Autowired BuyerCartService cart;
@@ -102,6 +112,24 @@ class OrdersSqlIntegrationTest {
     }
     private CheckoutRequest request(AccountAuthService.Session user,String method) {
         return request(user,method,UUID.randomUUID().toString());
+    }
+    private CheckoutRequest requestWithPromotion(AccountAuthService.Session user,int promotionId) {
+        var preview=checkout.preview(subject(user),provider,promotionId);
+        return new CheckoutRequest(UUID.randomUUID().toString(),preview.quoteFingerprint(),
+                "QA Receiver","0909000456","QA Address",provider,"COD",promotionId);
+    }
+    private int coupon(int quantity,int... variants) {
+        int promotion=insert("""
+            INSERT INTO Promotion(Quantity,Start_Date,Expiration_Date,Min_Bill,Type,Seller_ID)
+            VALUES (?,DATEADD(day,-1,SYSDATETIME()),DATEADD(day,1,SYSDATETIME()),0,N'COUPON',?)
+            ""","Promotion_ID",quantity,seller.account().id());
+        db.update("INSERT INTO Coupon(Promotion_ID,percent_discount) VALUES (?,10)",promotion);
+        for(int variant:variants)
+            db.update("INSERT INTO Promotion_Apply(Variant_ID,Promotion_ID) VALUES (?,?)",variant,promotion);
+        return promotion;
+    }
+    private int promotionQuantity(int promotion) {
+        return db.queryForObject("SELECT Quantity FROM Promotion WHERE Promotion_ID=?",Integer.class,promotion);
     }
     private int stock(int variant) { return db.queryForObject("SELECT Quantity_Stock FROM Product_Variant WHERE Variant_ID=?",Integer.class,variant); }
     private long countKey(AccountAuthService.Session user,String key) {
@@ -303,12 +331,145 @@ class OrdersSqlIntegrationTest {
         assertEquals(1,buyerPage.totalElements()); assertEquals(1,buyerPage.items().size());
         assertEquals(2,buyerPage.items().getFirst().shops().getFirst().items().size());
     }
-    private int httpStatus(String path,String token,String method,String body) throws Exception {
+
+    @Test void seededHistoryKeepsTheStoredOrderTotalAndSupportsSellerFilters() {
+        var orderedAt = LocalDateTime.of(2026, 10, 29, 14, 30);
+        var paidAt = orderedAt.plusMinutes(5);
+        var storedTotal = new BigDecimal("540000.00");
+
+        int order = insert("""
+            INSERT INTO [Order](Order_Time,Total_Price,Delivery_Address,Buyer_ID) VALUES (?,?,?,?)
+            """, "Order_ID", Timestamp.valueOf(orderedAt), storedTotal, "QA Address", buyerA.account().id());
+
+        int shop = insert("""
+            INSERT INTO Shop_Order(Order_ID,Seller_ID,Provider_ID,Shipping_Fee,Tracking_Number,Delivery_Status)
+            VALUES (?,?,?,?,?,N'SHIPPING')
+            """, "Shop_Order_ID", order, seller.account().id(), provider, new BigDecimal("22000.00"), "QA-" + suffix);
+
+        db.update("""
+            INSERT INTO Shop_Order_Item(Shop_Order_ID,Variant_ID,Quantity,Purchase_Price) VALUES (?,?,1,120000.00)
+            """, shop, normal);
+
+        db.update("""
+            INSERT INTO Payment_Information(Order_ID,Transaction_Code,Payment_Method,Payment_Status,Payment_Time)
+            VALUES (?,?,N'VNPAY',N'COMPLETED',?)
+            """, order, "QA-PAY-" + suffix, Timestamp.valueOf(paidAt));
+
+        var history = orders.buyerOrder(subject(buyerA), order);
+        assertEquals(storedTotal, history.originalTotal());
+        assertEquals(storedTotal, history.payableTotal());
+        assertEquals(paidAt, history.payment().paidAt());
+        assertEquals("Normal variant", history.shops().getFirst().items().getFirst().variantName());
+
+        var date = orderedAt.toLocalDate();
+        var forSeller = orders.sellerOrders(subject(seller), OrderRules.filter("SHIPPING", date, date, 0, 10));
+        var shopView = forSeller.items().getFirst();
+        assertEquals(1, forSeller.totalElements());
+        assertEquals(new BigDecimal("142000.00"), shopView.total());
+        assertEquals(paidAt, shopView.payment().paidAt());
+        assertEquals(buyerA.account().id(), shopView.buyerId());
+        assertEquals("Normal variant", shopView.items().getFirst().variantName());
+        assertFalse(shopView.buyerCanCancel());
+        assertEquals(List.of("DELIVERED"), shopView.allowedTransitions());
+        assertEquals(0, orders.sellerOrders(subject(seller),
+                OrderRules.filter("SHIPPING", date.plusDays(1), date.plusDays(1), 0, 10)).totalElements());
+
+        db.update("UPDATE Shop_Order SET Delivery_Status=N'CANCELLED' WHERE Shop_Order_ID=?", shop);
+        db.update("UPDATE Payment_Information SET Payment_Status=N'FAILED' WHERE Order_ID=?", order);
+        var cancelled = orders.buyerOrder(subject(buyerA), order);
+
+        assertEquals(storedTotal, cancelled.originalTotal());
+        assertEquals(0, cancelled.payableTotal().signum());
+        assertNull(cancelled.payment().paidAt());
+    }
+
+    private HttpResponse<String> http(String path,String token,String method,String body) throws Exception {
         var builder=HttpRequest.newBuilder(URI.create("http://localhost:"+port+"/api"+path));
         if(token!=null) builder.header("Authorization","Bearer "+token);
         if(body!=null) builder.header("Content-Type","application/json");
         builder.method(method,body==null?HttpRequest.BodyPublishers.noBody():HttpRequest.BodyPublishers.ofString(body));
-        return HttpClient.newHttpClient().send(builder.build(),HttpResponse.BodyHandlers.discarding()).statusCode();
+        return HttpClient.newHttpClient().send(builder.build(),HttpResponse.BodyHandlers.ofString());
+    }
+    private int httpStatus(String path,String token,String method,String body) throws Exception {
+        return http(path,token,method,body).statusCode();
+    }
+    @Test void voucherCheckoutOverHttpKeepsDiscountInSellerAndBuyerHistory() throws Exception {
+        var otherSeller=account(true,"s2");
+        int other=product(otherSeller.account().id(),"Other",new BigDecimal("50000.00"),7);
+        int promotion=coupon(3,normal);
+        add(buyerA,normal,1); add(buyerA,other,1);
+        var response=http("/buyer/checkout/preview?providerId="+provider+"&promotionId="+promotion,
+                buyerA.token(),"GET",null);
+        assertEquals(200,response.statusCode(),response.body());
+        var preview=JSON.readValue(response.body(),CheckoutPreview.class);
+        assertEquals(promotion,preview.promotionId());
+        assertEquals(new BigDecimal("10000.00"),preview.discountAmount());
+        assertEquals(new BigDecimal("184000.00"),preview.total());
+        assertEquals(3,promotionQuantity(promotion));
+
+        var request=new CheckoutRequest(UUID.randomUUID().toString(),preview.quoteFingerprint(),
+                "QA Receiver","0909000456","QA Address",provider,"COD",promotion);
+        String body=JSON.writeValueAsString(request);
+        var created=http("/buyer/checkout",buyerA.token(),"POST",body);
+        assertEquals(201,created.statusCode(),created.body());
+        var order=JSON.readValue(created.body(),CheckoutResult.class).order();
+        assertEquals(preview.total(),order.originalTotal());
+        assertEquals(preview.discountAmount(),order.discountAmount());
+        assertEquals(2,promotionQuantity(promotion));
+        var replay=http("/buyer/checkout",buyerA.token(),"POST",body);
+        assertEquals(200,replay.statusCode(),replay.body());
+        assertEquals(order.id(),JSON.readValue(replay.body(),CheckoutResult.class).order().id());
+        assertEquals(2,promotionQuantity(promotion));
+        assertEquals(4,stock(normal));
+        assertEquals(6,stock(other));
+        assertTrue(cart.get(subject(buyerA)).items().isEmpty());
+
+        db.update("DELETE FROM Promotion WHERE Promotion_ID=?",promotion);
+        var history=orders.buyerOrder(subject(buyerA),order.id());
+        var discounted=history.shops().stream().filter(s->s.sellerId()==seller.account().id()).findFirst().orElseThrow();
+        var sellerView=orders.sellerOrder(subject(seller),discounted.id());
+        assertEquals(promotion,sellerView.promotionId());
+        assertEquals(new BigDecimal("10000.00"),sellerView.discountAmount());
+        assertEquals(new BigDecimal("112000.00"),sellerView.total());
+        var otherShop=history.shops().stream().filter(s->s.sellerId()==otherSeller.account().id()).findFirst().orElseThrow();
+        assertNull(otherShop.promotionId());
+        assertEquals(0,otherShop.discountAmount().signum());
+        orders.cancelBuyerShop(subject(buyerA),discounted.id(),new CancelRequest("PENDING"));
+        assertEquals(new BigDecimal("72000.00"),orders.buyerOrder(subject(buyerA),order.id()).payableTotal());
+    }
+    @Test void checkoutFailureRollsBackVoucherUsageAndOrderWrites() {
+        int promotion=coupon(2,normal);
+        add(buyerA,normal,1);
+        var request=requestWithPromotion(buyerA,promotion);
+        checkpoint.failAt.set("commit");
+        assertThrows(IllegalStateException.class,()->checkout.checkout(subject(buyerA),request));
+        assertEquals(2,promotionQuantity(promotion));
+        assertEquals(0,countKey(buyerA,request.requestKey()));
+        assertEquals(5,stock(normal));
+        assertEquals(1,cart.get(subject(buyerA)).totalQuantity());
+    }
+    @Test void changedVoucherQuoteRollsBackConsumption() {
+        int promotion=coupon(2,normal);
+        add(buyerA,normal,1);
+        var request=requestWithPromotion(buyerA,promotion);
+        db.update("UPDATE Coupon SET percent_discount=20 WHERE Promotion_ID=?",promotion);
+        status(409,()->checkout.checkout(subject(buyerA),request));
+        assertEquals(2,promotionQuantity(promotion));
+        assertEquals(0,countKey(buyerA,request.requestKey()));
+        assertEquals(5,stock(normal));
+    }
+    @Test void onlyOneCheckoutCanConsumeTheLastVoucherUse() throws Exception {
+        int promotion=coupon(1,normal,last);
+        add(buyerA,normal,1); add(buyerB,last,1);
+        var a=requestWithPromotion(buyerA,promotion);
+        var b=requestWithPromotion(buyerB,promotion);
+        var statuses=parallel(()->resultStatus(()->checkout.checkout(subject(buyerA),a)),
+                ()->resultStatus(()->checkout.checkout(subject(buyerB),b)));
+        assertEquals(1,Collections.frequency(statuses,200));
+        assertEquals(1,Collections.frequency(statuses,409));
+        assertEquals(0,promotionQuantity(promotion));
+        assertEquals(1,countKey(buyerA,a.requestKey())+countKey(buyerB,b.requestKey()));
+        assertEquals(5,stock(normal)+stock(last));
     }
     @Test void httpRoutesEnforceRolesAndValidateCheckoutPayload() throws Exception {
         assertEquals(401,httpStatus("/buyer/checkout/options",null,"GET",null));

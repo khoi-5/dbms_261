@@ -33,6 +33,7 @@ function BuyerOrderList() {
           <DeliveryBadge status={shop.status} /></div>)}</div>
         <div className="order-card-footer"><PaymentInfo payment={order.payment} /><div>
           <small>Tổng đặt hàng</small><strong>{orderMoney(order.originalTotal)}</strong>
+          {order.discountAmount > 0 && <small>Ưu đãi lúc đặt − {orderMoney(order.discountAmount)}</small>}
           {Number(order.payableTotal) !== Number(order.originalTotal) && <small>Sau hủy: {orderMoney(order.payableTotal)}</small>}
         </div></div>
       </article>)}</div>}
@@ -73,6 +74,7 @@ function BuyerOrderDetails({ id }) {
         <p>{order.deliveryAddress}</p><small>Đặt lúc {orderDate(order.orderedAt)}</small></div>
         <div><h2>Thanh toán</h2><PaymentInfo payment={order.payment} />
           <p>Tổng đặt hàng: <strong>{orderMoney(order.originalTotal)}</strong></p>
+          {order.discountAmount > 0 && <p>Ưu đãi lúc đặt − {orderMoney(order.discountAmount)}</p>}
           {Number(order.originalTotal) !== Number(order.payableTotal) && <p>Giá trị các phần chưa hủy: <strong>{orderMoney(order.payableTotal)}</strong></p>}
         </div></section>
       {order.shops.map(shop => <ShopOrderCard key={shop.id} shop={shop}>

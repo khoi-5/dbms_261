@@ -2,8 +2,15 @@ import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
 import { api } from '../services/api';
-import { clearCheckoutIntent, readCheckoutIntent, saveCheckoutIntent, orderMoney } from '../services/orders';
+import { clearCheckoutIntent, readCheckoutIntent, saveCheckoutIntent, orderMoney,
+  clearCheckoutPromotion, readCheckoutPromotion } from '../services/orders';
 import '../styles/orders.css';
+
+function finishCheckout(accountId, promotionId) {
+  clearCheckoutIntent(accountId);
+  clearCheckoutPromotion(promotionId);
+  window.dispatchEvent(new Event('cart-updated'));
+}
 
 export default function CheckoutPage() {
   const { user } = useAuth();
@@ -16,6 +23,9 @@ export default function CheckoutPage() {
   const [busy, setBusy] = useState(false);
   const [loading, setLoading] = useState(true);
   const [pending, setPending] = useState(() => readCheckoutIntent(user.id));
+  const [promotionId, setPromotionId] = useState(readCheckoutPromotion);
+  const quotedPromotionId = pending ? pending.payload.promotionId ?? null : promotionId;
+  const ready = preview?.available && (preview.promotionId ?? null) === quotedPromotionId;
   const [reload, setReload] = useState(0);
   const working = useRef(false);
   const actor = useRef(user.id);
@@ -33,7 +43,10 @@ export default function CheckoutPage() {
         if (saved) {
           try {
             const order = await api('/buyer/checkout/requests/' + saved.payload.requestKey, { signal: abort.signal });
-            if (!abort.signal.aborted) { clearCheckoutIntent(user.id); navigate('/orders/' + order.id, { replace: true }); }
+            if (!abort.signal.aborted) {
+              finishCheckout(user.id, saved.payload.promotionId);
+              navigate('/orders/' + order.id, { replace: true });
+            }
             return;
           } catch (e) { if (e.status !== 404) throw e; }
         }
@@ -55,11 +68,13 @@ export default function CheckoutPage() {
   useEffect(() => {
     if (!fields.providerId) return;
     const abort = new AbortController();
-    api('/buyer/checkout/preview?providerId=' + fields.providerId, { signal: abort.signal })
+    const query = new URLSearchParams({ providerId: String(fields.providerId) });
+    if (quotedPromotionId !== null) query.set('promotionId', String(quotedPromotionId));
+    api('/buyer/checkout/preview?' + query, { signal: abort.signal })
       .then(value => { if (!abort.signal.aborted) setPreview(value); })
       .catch(e => { if (!abort.signal.aborted) setError(e.message); });
     return () => abort.abort();
-  }, [fields.providerId, reload]);
+  }, [fields.providerId, quotedPromotionId, reload]);
 
   async function send(payload) {
     if (working.current) return;
@@ -69,7 +84,7 @@ export default function CheckoutPage() {
       const intent = saveCheckoutIntent(accountId, payload); setPending(intent);
       const result = await api('/buyer/checkout', { method: 'POST', body: payload });
       if (!active.current || actor.current !== accountId) return;
-      clearCheckoutIntent(accountId);
+      finishCheckout(accountId, payload.promotionId);
       navigate('/orders/' + result.order.id, { replace: true, state: { placed: true } });
     } catch (e) {
       if (!active.current || actor.current !== accountId) return;
@@ -88,7 +103,8 @@ export default function CheckoutPage() {
     try {
       const order = await api('/buyer/checkout/requests/' + pending.payload.requestKey);
       if (!active.current || actor.current !== accountId) return;
-      clearCheckoutIntent(accountId); navigate('/orders/' + order.id, { replace: true });
+      finishCheckout(accountId, pending.payload.promotionId);
+      navigate('/orders/' + order.id, { replace: true });
     } catch (e) {
       if (active.current && actor.current === accountId)
         setError(e.status === 404 ? 'Chưa tìm thấy đơn. Bạn có thể gửi lại cùng yêu cầu.' : e.message);
@@ -97,20 +113,27 @@ export default function CheckoutPage() {
   }
   function submit(e) {
     e.preventDefault();
-    if (!preview?.available || !options || busy) return;
+    if (!ready || !options || busy || pending) return;
     send({ ...fields, providerId: Number(fields.providerId), quoteFingerprint: preview.quoteFingerprint,
-      requestKey: crypto.randomUUID() });
+      promotionId: quotedPromotionId ?? undefined, requestKey: crypto.randomUUID() });
   }
   function change(name, value) {
     if (name === 'providerId') setPreview(null);
     setFields(current => ({ ...current, [name]: value }));
   }
+  function removePromotion() {
+    clearCheckoutPromotion(promotionId);
+    setPromotionId(null); setPreview(null); setError('');
+  }
   return <div className="orders-feature">
     <header className="page-header"><div><p className="eyebrow">HOÀN TẤT ĐƠN HÀNG</p><h1>Checkout và thanh toán</h1>
       <p className="muted">Xác nhận thông tin nhận hàng và tổng tiền trước khi đặt.</p></div><Link to="/cart">← Giỏ hàng</Link></header>
     {error && <div className="error" role="alert">{error} <button disabled={busy} onClick={() => {
-      setError(''); if (!options) setLoading(true); setReload(v => v + 1);
+      setError(''); setPreview(null); if (!options) setLoading(true); setReload(v => v + 1);
     }}>Tải lại</button></div>}
+    {quotedPromotionId !== null && !pending && <div className="order-actions">
+      <button type="button" disabled={busy} onClick={removePromotion}>Bỏ ưu đãi #{quotedPromotionId}</button>
+    </div>}
     {notice && <p className="success" role="status">{notice}</p>}
     {pending && <section className="order-recovery"><h2>Kiểm tra yêu cầu đặt hàng trước</h2>
       <p>Thông tin yêu cầu được giữ lại để kiểm tra kết quả và tránh đặt trùng đơn.</p>
@@ -120,7 +143,7 @@ export default function CheckoutPage() {
     </section>}
     {loading ? <div className="state" role="status">Đang tải thông tin thanh toán…</div> : options && <>
       {!options.providers.length ? <p className="error">Chưa có đơn vị vận chuyển.</p> :
-        !preview ? <div className="state" role="status">Đang cập nhật tổng tiền…</div> :
+        !preview ? (!error && <div className="state" role="status">Đang cập nhật tổng tiền…</div>) :
           !preview.items.length && !pending ? <div className="state"><h2>Giỏ hàng đang trống</h2><Link to="/products">Chọn sản phẩm</Link></div> :
             <div className="checkout-grid"><form className="order-card checkout-form" onSubmit={submit}>
               <fieldset disabled={busy || !!pending}>
@@ -138,7 +161,7 @@ export default function CheckoutPage() {
                   {options.paymentMethods.map(method => <option key={method.code} value={method.code}>{method.label}</option>)}
                 </select></label>
                 {fields.paymentMethod === 'DEMO' && <p className="order-demo-label">Thanh toán mô phỏng cho bài thực hành, không thu tiền thật.</p>}
-                <button className="primary" disabled={!preview.available}>{busy ? 'Đang đặt hàng…' : 'Xác nhận đặt hàng'}</button>
+                <button className="primary" disabled={!ready}>{busy ? 'Đang đặt hàng…' : 'Xác nhận đặt hàng'}</button>
               </fieldset>
             </form><section className="order-card"><h2>Đơn hàng của bạn</h2>
               {preview.items.map(item => <div className="checkout-line" key={item.variantId}>
@@ -149,6 +172,7 @@ export default function CheckoutPage() {
               </div>)}
               <dl className="order-totals"><div><dt>Tiền hàng</dt><dd>{orderMoney(preview.subtotal)}</dd></div>
                 <div><dt>Vận chuyển ({preview.shopCount} shop)</dt><dd>{orderMoney(preview.shippingTotal)}</dd></div>
+                {preview.discountAmount > 0 && <div><dt>Ưu đãi #{preview.promotionId}</dt><dd>− {orderMoney(preview.discountAmount)}</dd></div>}
                 <div className="order-grand-total"><dt>Tổng cộng</dt><dd>{orderMoney(preview.total)}</dd></div></dl>
               {!preview.available && preview.items.length > 0 && <p className="error">Vui lòng <Link to="/cart">điều chỉnh giỏ hàng</Link> trước khi đặt.</p>}
             </section></div>}

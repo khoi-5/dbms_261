@@ -6,6 +6,9 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.bkpee.orders.OrderModels.PaymentOption;
+
 import static com.bkpee.orders.OrderModels.*;
 
 @Service
@@ -14,7 +17,7 @@ public class PaymentService {
     private final Environment env;
     public PaymentService(OrderJdbcRepository orders,Environment env) { this.orders=orders; this.env=env; }
     public boolean demoEnabled() {
-        return env.getProperty("ORDERS_DEMO_PAYMENTS_ENABLED",Boolean.class,false) && orders.isTestDatabase();
+        return env.getProperty("ORDERS_DEMO_PAYMENTS_ENABLED", Boolean.class, false);
     }
     public List<PaymentOption> methods() {
         var methods=new ArrayList<PaymentOption>();

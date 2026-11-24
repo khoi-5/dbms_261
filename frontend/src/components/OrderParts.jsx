@@ -56,6 +56,7 @@ export function ShopOrderCard({ shop, children }) {
     </div>
     <dl className="order-totals"><div><dt>Tiền hàng</dt><dd>{orderMoney(shop.subtotal)}</dd></div>
       <div><dt>Phí vận chuyển</dt><dd>{orderMoney(shop.shippingFee)}</dd></div>
+      {shop.discountAmount > 0 && <div><dt>Ưu đãi #{shop.promotionId}</dt><dd>− {orderMoney(shop.discountAmount)}</dd></div>}
       <div><dt>Tổng phần đơn</dt><dd>{orderMoney(shop.total)}</dd></div>
       {shop.status === 'CANCELLED' && <div><dt>Còn phải trả cho phần đơn này</dt><dd>{orderMoney(0)}</dd></div>}
     </dl>

@@ -71,4 +71,22 @@ class OrderRulesTest {
         var changed=new CheckoutRequest("request-0001",quote,"Other","0909000123","Address",1,"COD");
         assertFalse(java.security.MessageDigest.isEqual(OrderRules.requestHash(a),OrderRules.requestHash(changed)));
     }
+    @Test void checkoutQuoteAndRequestBindThePromotionAndDiscount() {
+        var provider=new ShippingProvider(4,"QA",new BigDecimal("22000.00"));
+        var line=new CartLine(7,8,9,"QA product",null,"QA shop",null,
+                new BigDecimal("100000.00"),3,true,"ACTIVE",1);
+        var items=List.of(line);
+        var promotion=new AppliedPromotion(11,9,new BigDecimal("10000.00"));
+        String quote=OrderRules.quote(2,provider,items,promotion);
+        assertNotEquals(OrderRules.quote(2,provider,items),quote);
+        assertNotEquals(quote,OrderRules.quote(2,provider,items,
+                new AppliedPromotion(12,9,promotion.discountAmount())));
+        assertNotEquals(quote,OrderRules.quote(2,provider,items,
+                new AppliedPromotion(11,9,new BigDecimal("20000.00"))));
+
+        var original=new CheckoutRequest("request-0001",quote,"Buyer","0909000123","Address",4,"COD",11);
+        var changed=new CheckoutRequest("request-0001",quote,"Buyer","0909000123","Address",4,"COD",12);
+        assertEquals(11,OrderRules.normalize(original).promotionId());
+        assertFalse(java.security.MessageDigest.isEqual(OrderRules.requestHash(original),OrderRules.requestHash(changed)));
+    }
 }

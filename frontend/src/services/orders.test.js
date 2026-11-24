@@ -1,6 +1,7 @@
 import { beforeEach, test } from 'node:test';
 import assert from 'node:assert/strict';
-import { clearCheckoutIntent, readCheckoutIntent, saveCheckoutIntent, orderQuery, orderDate } from './orders.js';
+import { clearCheckoutIntent, readCheckoutIntent, saveCheckoutIntent, orderQuery, orderDate,
+  clearCheckoutPromotion, readCheckoutPromotion } from './orders.js';
 
 beforeEach(() => {
   const values = new Map();
@@ -11,12 +12,26 @@ beforeEach(() => {
   };
 });
 test('an uncertain checkout retains the same full payload and stays scoped to the account', () => {
-  const payload = { requestKey: 'request-0001', quoteFingerprint: 'a'.repeat(64), deliveryAddress: 'Demo' };
+  const payload = { requestKey: 'request-0001', quoteFingerprint: 'a'.repeat(64),
+    deliveryAddress: 'Demo', promotionId: 17 };
   saveCheckoutIntent(1, payload);
   assert.deepEqual(readCheckoutIntent(1).payload, payload);
   assert.equal(readCheckoutIntent(2), null);
   clearCheckoutIntent(1);
   assert.equal(readCheckoutIntent(1), null);
+});
+test('checkout uses the Cart voucher key and clears only the completed selection', () => {
+  const key = 'checkout.promotionId';
+  for (const value of ['0', '-1', '2.5', 'wrong', '2147483648']) {
+    sessionStorage.setItem(key, value);
+    assert.equal(readCheckoutPromotion(), null);
+  }
+  sessionStorage.setItem(key, '17');
+  assert.equal(readCheckoutPromotion(), 17);
+  clearCheckoutPromotion(18);
+  assert.equal(readCheckoutPromotion(), 17);
+  clearCheckoutPromotion(17);
+  assert.equal(readCheckoutPromotion(), null);
 });
 test('malformed recovery data does not become a checkout request', () => {
   sessionStorage.setItem('bkpee.checkout.intent.1', '{broken');

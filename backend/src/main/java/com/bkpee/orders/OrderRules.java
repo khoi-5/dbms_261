@@ -28,8 +28,9 @@ public final class OrderRules {
         String method = text(r.paymentMethod(),10,"Phương thức thanh toán");
         if (!key.matches("[A-Za-z0-9_-]{8,64}") || !fingerprint.matches("[a-f0-9]{64}")
                 || !phone.matches("[+0-9]{8,20}") || r.providerId()==null || r.providerId()<1
+                || (r.promotionId()!=null && r.promotionId()<1)
                 || !Set.of("COD","DEMO").contains(method)) throw bad("Dữ liệu đặt hàng không hợp lệ");
-        return new CheckoutRequest(key,fingerprint,receiver,phone,address,r.providerId(),method);
+        return new CheckoutRequest(key,fingerprint,receiver,phone,address,r.providerId(),method,r.promotionId());
     }
 
     public static String text(String value, int max, String label) {
@@ -58,6 +59,10 @@ public final class OrderRules {
         return (int)lines.stream().map(CartLine::sellerId).distinct().count();
     }
     public static String quote(int buyerId, ShippingProvider provider, List<CartLine> lines) {
+        return quote(buyerId,provider,lines,null);
+    }
+    public static String quote(int buyerId, ShippingProvider provider, List<CartLine> lines,
+                               AppliedPromotion promotion) {
         var fields = new ArrayList<String>();
         fields.add(Integer.toString(buyerId)); fields.add(Integer.toString(provider.id()));
         fields.add(provider.fee().setScale(2).toPlainString());
@@ -68,11 +73,18 @@ public final class OrderRules {
             fields.add(Objects.toString(line.variantName(),""));
             fields.add(Boolean.toString(line.active())); fields.add(line.sellerStatus());
         });
+        if (promotion!=null) {
+            fields.add(Integer.toString(promotion.id()));
+            fields.add(Integer.toString(promotion.sellerId()));
+            fields.add(promotion.discountAmount().setScale(2).toPlainString());
+        }
         return HexFormat.of().formatHex(hash(fields));
     }
     public static byte[] requestHash(CheckoutRequest r) {
-        return hash(List.of(r.quoteFingerprint(),r.receiverName(),r.receiverPhone(),
+        var fields = new ArrayList<>(List.of(r.quoteFingerprint(),r.receiverName(),r.receiverPhone(),
                 r.deliveryAddress(),r.providerId().toString(),r.paymentMethod()));
+        if (r.promotionId()!=null) fields.add(r.promotionId().toString());
+        return hash(fields);
     }
     private static byte[] hash(List<String> fields) {
         try {

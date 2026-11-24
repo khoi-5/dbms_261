@@ -16,7 +16,13 @@ public final class OrderModels {
             @NotBlank @Pattern(regexp="[+0-9]{8,20}") String receiverPhone,
             @NotBlank @Size(max=255) String deliveryAddress,
             @NotNull @Positive Integer providerId,
-            @NotBlank @Pattern(regexp="COD|DEMO") String paymentMethod) {}
+            @NotBlank @Pattern(regexp="COD|DEMO") String paymentMethod,
+            @Positive Integer promotionId) {
+        public CheckoutRequest(String requestKey, String quoteFingerprint, String receiverName, String receiverPhone,
+                               String deliveryAddress, Integer providerId, String paymentMethod) {
+            this(requestKey,quoteFingerprint,receiverName,receiverPhone,deliveryAddress,providerId,paymentMethod,null);
+        }
+    }
 
     public record StatusRequest(
             @NotBlank String expectedStatus, @NotBlank String newStatus,
@@ -40,8 +46,9 @@ public final class OrderModels {
     public record PreviewItem(int variantId, String name, String variantName, String shop, String image,
                               BigDecimal price, int stock, int quantity,
                               BigDecimal subtotal, boolean available) {}
+    public record AppliedPromotion(int id, int sellerId, BigDecimal discountAmount) {}
     public record CheckoutPreview(List<PreviewItem> items, BigDecimal subtotal,
-                                  BigDecimal shippingTotal, BigDecimal total,
+                                  BigDecimal shippingTotal, Integer promotionId, BigDecimal discountAmount, BigDecimal total,
                                   int shopCount, String quoteFingerprint, boolean available) {}
     public record PaymentView(String method, String status, boolean simulated, LocalDateTime paidAt) {}
     public record LineItem(int variantId, String name, String variantName, String image, int quantity,
@@ -51,13 +58,14 @@ public final class OrderModels {
                                 String receiverName, String receiverPhone, String deliveryAddress,
                                 int providerId, String providerName, String trackingNumber,
                                 String status, BigDecimal shippingFee, BigDecimal subtotal,
+                                Integer promotionId, BigDecimal discountAmount,
                                 BigDecimal total, BigDecimal payableTotal, boolean stockDeducted,
                                 PaymentView payment, LocalDateTime shippedAt, LocalDateTime deliveredAt,
                                 LocalDateTime buyerReceivedAt,
                                 List<LineItem> items, List<String> allowedTransitions,
                                 boolean buyerCanCancel, boolean buyerCanConfirmReceipt) {}
     public record OrderView(int id, LocalDateTime orderedAt, BigDecimal originalTotal,
-                            BigDecimal payableTotal, String receiverName, String receiverPhone,
+                            BigDecimal payableTotal, BigDecimal discountAmount, String receiverName, String receiverPhone,
                             String deliveryAddress, PaymentView payment, List<ShopOrderView> shops) {}
     public record CheckoutResult(OrderView order, boolean replayed) {}
     public record Page<T>(List<T> items, int page, int size, long totalElements, long totalPages) {}

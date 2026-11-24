@@ -18,8 +18,9 @@ public class OrdersApi {
     @GetMapping("/buyer/checkout/options")
     public CheckoutOptions options(@AuthenticationPrincipal Jwt jwt) { return checkout.options(jwt.getSubject()); }
     @GetMapping("/buyer/checkout/preview")
-    public CheckoutPreview preview(@AuthenticationPrincipal Jwt jwt,@RequestParam int providerId) {
-        return checkout.preview(jwt.getSubject(),providerId);
+    public CheckoutPreview preview(@AuthenticationPrincipal Jwt jwt,@RequestParam int providerId,
+                                    @RequestParam(required=false) Integer promotionId) {
+        return checkout.preview(jwt.getSubject(),providerId,promotionId);
     }
     @GetMapping("/buyer/checkout/requests/{requestKey}")
     public OrderView lookup(@AuthenticationPrincipal Jwt jwt,@PathVariable String requestKey) {
