@@ -36,10 +36,10 @@ Tài liệu tóm tắt phần triển khai của thành viên **M5 (Query Proces
 ## 4. Hướng dẫn chạy thực nghiệm Query Processing (SQL Server vs MongoDB)
 
 1. **Kiểm chứng đúng đắn trên dữ liệu nhỏ:**
-   - Nạp `database/02_seed_small.sql` (SQL Server) và `database/init_mongodb.js` (MongoDB).
+   - Tạo schema SQL bằng `database/v1/01_schema.sql`, sau đó nạp `database/v1/02_seed_small.sql` (SQL Server) và `database/v1/init_mongodb.js` (MongoDB).
    - Chạy `sqlserver_query_processing.sql` và `mongodb_query_processing.js` để xác nhận kết quả Q1, Q2, Q3 khớp nhau 100%.
 2. **Đo hiệu năng & Execution Plan trên dữ liệu lớn:**
-   - Nạp `database/03_seed_large.sql` và đồng bộ sang MongoDB qua `database/setup_mongodb.py`.
+   - Nạp `database/v1/03_seed_large.sql` sau schema V1; sinh dữ liệu MongoDB bằng `python database/v1/setup_mongodb.py --mode large` từ thư mục gốc dự án. Script Python sinh dữ liệu độc lập, không sao chép từ SQL Server.
    - **SQL Server (SSMS):** Bật **Include Actual Execution Plan (`Ctrl + M`)**, chạy `database/query_processing/sqlserver_query_processing.sql`, ghi lại `logical reads`, `CPU time`, `elapsed time` và hình Execution Plan cho:
      - Q1 (JOIN + Hash/Stream Aggregate theo tháng)
      - Q2 (6-table JOIN + GROUP BY theo Category)

@@ -46,9 +46,7 @@ public class OrderJdbcRepository {
         if (missing.isEmpty()) return;
 
         var columns = missing.stream().map(MissingColumn::column).toList();
-        String action = columns.contains("dbo.Product_Variant.Variant_Name")
-                ? "Bổ sung Product_Variant.Variant_Name theo schema nhóm, rồi chạy database/order_migration.sql."
-                : "Chọn database này rồi chạy database/order_migration.sql.";
+        String action = "Kiểm tra schema V2 tại database/v2/01_schema.sql; chỉ khởi tạo sau khi xác nhận đúng database và dữ liệu cần giữ.";
         throw new ResponseStatusException(SERVICE_UNAVAILABLE,
                 "CSDL " + missing.getFirst().database() + " chưa đủ schema đơn hàng. Thiếu "
                         + String.join(", ", columns) + ". " + action);

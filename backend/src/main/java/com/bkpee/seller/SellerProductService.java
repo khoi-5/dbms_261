@@ -388,7 +388,7 @@ public class SellerProductService {
                         db.update("UPDATE Product_Variant SET Is_Active = 0 WHERE Variant_ID = ?", oldId);
                     } else {
                         // Chưa có đơn hàng: xóa sạch khỏi Cart_Item và Product_Variant
-                        db.update("DELETE FROM Cart_Item WHERE Variant_ID = ?", oldId);
+                        deleteCartItemsAndRefresh("Variant_ID = ?", oldId);
                         db.update("DELETE FROM Product_Variant WHERE Variant_ID = ?", oldId);
                     }
                 }
@@ -518,10 +518,24 @@ public class SellerProductService {
         }
 
         // Clean from Cart_Item first
-        db.update("DELETE FROM Cart_Item WHERE Variant_ID IN (SELECT Variant_ID FROM Product_Variant WHERE Product_ID = ?)", productId);
+        deleteCartItemsAndRefresh("Variant_ID IN (SELECT Variant_ID FROM Product_Variant WHERE Product_ID = ?)", productId);
 
         // Delete Product (Cascades to Books, Clothes, Electronics, Book_Author, and Product_Variant)
         db.update("DELETE FROM Product WHERE Product_ID = ? AND Seller_ID = ?", productId, sellerId);
+    }
+
+    private void deleteCartItemsAndRefresh(String condition, int id) {
+        db.update("""
+            DECLARE @AffectedCarts TABLE (Cart_ID INT NOT NULL);
+            DELETE FROM Cart_Item OUTPUT deleted.Cart_ID INTO @AffectedCarts WHERE
+            """ + condition + """
+            ;
+            UPDATE c SET Total_product = (
+                SELECT COALESCE(SUM(CONVERT(BIGINT, ci.Quantity)), 0)
+                FROM Cart_Item ci WHERE ci.Cart_ID = c.Cart_ID
+            ), Updated_At = SYSDATETIME()
+            FROM Cart c WHERE EXISTS (SELECT 1 FROM @AffectedCarts a WHERE a.Cart_ID = c.Cart_ID);
+            """, id);
     }
 
     // ── Variant management ─────────────────────────────────────────────────────
