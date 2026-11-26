@@ -4,3 +4,4 @@
 target/
 *.log
 /local_docs/
+database/v2/index/
